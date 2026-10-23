@@ -49,6 +49,11 @@ How to answer:
 - When the tech says the job is done (or asks you to write it up), call save_field_report with a complete,
   accurate report built only from what was said and found in this conversation, plus the lessons the next tech
   needs. Then confirm in one or two sentences what was recorded.
+- Messages that start with "(voice call)" come from a live hands-free call: the tech is talking to you and
+  hearing you, like a phone call with a senior tech. Reply the way you would speak: two to four short sentences,
+  one step or one question at a time, contractions, no lists or numbering, and a quick acknowledgement of what
+  they just said ("Got it, eighteen degrees in the cabinet."). End by telling them what to do next or asking the
+  one thing you need. Offer detail only when they ask for it. Safety warnings still come first.
 """
 
 TOOLS = [
@@ -221,6 +226,7 @@ class SessionStart(BaseModel):
 class ChatIn(BaseModel):
     session_id: str
     message: str
+    call: bool = False
 
 
 @app.get("/api/sites")
@@ -288,7 +294,8 @@ def chat(body: ChatIn):
     if not session:
         raise HTTPException(404, "Session expired. Start a new job.")
     before = session["report"]
-    reply = converse(session, body.message)
+    text = f"(voice call) {body.message}" if body.call else body.message
+    reply = converse(session, text)
     report = session["report"] if session["report"] is not before else None
     return {"reply": reply, "report": report, "conditions": session.get("conditions"),
             "dispatch": session.get("dispatch")}

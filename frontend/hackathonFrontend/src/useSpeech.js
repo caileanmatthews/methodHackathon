@@ -23,6 +23,17 @@ function speakable(text) {
     .trim()
 }
 
+// Prefer the neural/natural voices browsers ship (Edge "Online (Natural)", Chrome "Google"), then any US English.
+function pickVoice(voices) {
+  const en = voices.filter((v) => v.lang?.toLowerCase().startsWith('en'))
+  const score = (v) =>
+    (/natural|neural/i.test(v.name) ? 4 : 0) +
+    (/google/i.test(v.name) ? 3 : 0) +
+    (/aria|jenny|guy|samantha/i.test(v.name) ? 2 : 0) +
+    (v.lang === 'en-US' ? 1 : 0)
+  return en.sort((a, b) => score(b) - score(a))[0] || null
+}
+
 function pickMimeType() {
   for (const t of ['audio/webm;codecs=opus', 'audio/ogg;codecs=opus', 'audio/webm', 'audio/mp4']) {
     if (MediaRecorder.isTypeSupported?.(t)) return t
@@ -41,6 +52,10 @@ export function useSpeech({ onFinalTranscript }) {
   const recorderRef = useRef(null)
   // True while listening or transcribing; a ref so callbacks held across renders see the current value.
   const activeRef = useRef(false)
+  // Read synchronously by the call's voice detector, which runs outside React renders.
+  const speakingRef = useRef(false)
+  const speakGen = useRef(0)
+  const voiceRef = useRef(null)
   const callbackRef = useRef(onFinalTranscript)
   useEffect(() => {
     callbackRef.current = onFinalTranscript
@@ -165,7 +180,9 @@ export function useSpeech({ onFinalTranscript }) {
   const listen = useCallback(() => {
     if (activeRef.current || !MODE) return
     activeRef.current = true
+    speakGen.current++
     window.speechSynthesis?.cancel()
+    speakingRef.current = false
     setSpeaking(false)
     if (MODE === 'recorder') return startRecording()
     try {
@@ -182,29 +199,63 @@ export function useSpeech({ onFinalTranscript }) {
     } else recRef.current?.stop()
   }, [])
 
-  const speak = useCallback((text, onDone) => {
-    if (!window.speechSynthesis) return onDone?.()
-    window.speechSynthesis.cancel()
-    const u = new SpeechSynthesisUtterance(speakable(text))
-    u.rate = 1.05
-    u.onend = () => {
-      setSpeaking(false)
-      onDone?.()
+
+  useEffect(() => {
+    if (!window.speechSynthesis) return
+    const choose = () => {
+      voiceRef.current = pickVoice(window.speechSynthesis.getVoices())
     }
-    u.onerror = () => setSpeaking(false)
-    setSpeaking(true)
-    window.speechSynthesis.speak(u)
+    choose()
+    window.speechSynthesis.addEventListener?.('voiceschanged', choose)
+    return () => window.speechSynthesis.removeEventListener?.('voiceschanged', choose)
   }, [])
 
-  const stopSpeaking = useCallback(() => {
-    window.speechSynthesis?.cancel()
-    setSpeaking(false)
+  const setSpeakingBoth = useCallback((v) => {
+    speakingRef.current = v
+    setSpeaking(v)
   }, [])
+
+  // Speak sentence by sentence: sounds more natural, and avoids Chrome cutting off long utterances.
+  const speak = useCallback(
+    (text, onDone) => {
+      const synth = window.speechSynthesis
+      if (!synth) return onDone?.()
+      synth.cancel()
+      const gen = ++speakGen.current
+      const sentences = speakable(text).match(/[^.!?]+[.!?]*\s*/g) || []
+      if (sentences.length === 0) return onDone?.()
+      setSpeakingBoth(true)
+      sentences.forEach((s, i) => {
+        const u = new SpeechSynthesisUtterance(s.trim())
+        if (voiceRef.current) u.voice = voiceRef.current
+        u.rate = 1.03
+        if (i === sentences.length - 1) {
+          u.onend = () => {
+            if (gen !== speakGen.current) return
+            setSpeakingBoth(false)
+            onDone?.()
+          }
+        }
+        u.onerror = () => {
+          if (gen === speakGen.current) setSpeakingBoth(false)
+        }
+        synth.speak(u)
+      })
+    },
+    [setSpeakingBoth],
+  )
+
+  const stopSpeaking = useCallback(() => {
+    speakGen.current++
+    window.speechSynthesis?.cancel()
+    setSpeakingBoth(false)
+  }, [setSpeakingBoth])
 
   return {
     supported: Boolean(MODE),
     listening,
     speaking,
+    speakingRef,
     transcribing,
     interim,
     error,

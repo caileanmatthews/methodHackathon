@@ -1,0 +1,1275 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-23T19:04:18+00:00",
+  "title": "Design System: Field Assistant",
+  "extensions": {
+    "colorMeta": {
+      "shell-navy": {
+        "role": "secondary",
+        "displayName": "Shell Navy",
+        "canonical": "#0f2742",
+        "oklch": "oklch(26.9% 0.059 253.1)",
+        "tonalRamp": [
+          "#000a23",
+          "#0e2641",
+          "#2b4461",
+          "#496382",
+          "#6985a5",
+          "#8ba8ca",
+          "#afccef",
+          "#e4f0fe"
+        ],
+        "cssVar": "--shell",
+        "theme": "light"
+      },
+      "shell-navy-raised": {
+        "role": "secondary",
+        "displayName": "Raised Navy",
+        "canonical": "#173556",
+        "oklch": "oklch(32.4% 0.069 252.6)",
+        "tonalRamp": [
+          "#000a24",
+          "#072645",
+          "#254466",
+          "#446488",
+          "#6485ab",
+          "#86a8d0",
+          "#a9cdf6",
+          "#e3f0ff"
+        ],
+        "cssVar": "--shell-2",
+        "theme": "light"
+      },
+      "shell-text": {
+        "role": "neutral",
+        "displayName": "Shell Text",
+        "canonical": "#e9f0f8",
+        "oklch": "oklch(95.2% 0.013 251.6)",
+        "tonalRamp": [
+          "#070c11",
+          "#20262b",
+          "#3d4349",
+          "#5c6269",
+          "#7d838a",
+          "#9fa6ad",
+          "#c3cad2",
+          "#e8eff7"
+        ],
+        "cssVar": "--shell-text",
+        "theme": "light"
+      },
+      "shell-muted": {
+        "role": "neutral",
+        "displayName": "Shell Muted",
+        "canonical": "#9fb3c8",
+        "oklch": "oklch(75.8% 0.038 249.6)",
+        "tonalRamp": [
+          "#010c1a",
+          "#162637",
+          "#334455",
+          "#516376",
+          "#728598",
+          "#94a7bc",
+          "#b7cce1",
+          "#e2f0ff"
+        ],
+        "cssVar": "--shell-muted",
+        "theme": "light"
+      },
+      "utility-amber": {
+        "role": "tertiary",
+        "displayName": "Utility Amber",
+        "canonical": "#f2b230",
+        "oklch": "oklch(80.3% 0.153 79.9)",
+        "tonalRamp": [
+          "#140800",
+          "#332201",
+          "#563d08",
+          "#7f5a04",
+          "#a97807",
+          "#d29a28",
+          "#fdbd3f",
+          "#feeccf"
+        ],
+        "note": "Literal value in App.css (shell only); not a CSS custom property."
+      },
+      "utility-amber-ink": {
+        "role": "tertiary",
+        "displayName": "Amber Mark Ink",
+        "canonical": "#1c1300",
+        "oklch": "oklch(19.3% 0.039 87.2)",
+        "tonalRamp": [
+          "#120900",
+          "#2d240d",
+          "#4b4129",
+          "#6b6047",
+          "#8c8168",
+          "#b0a489",
+          "#d4c8ad",
+          "#faedd1"
+        ],
+        "note": "Literal value in App.css (shell only); not a CSS custom property."
+      },
+      "utility-amber-text": {
+        "role": "tertiary",
+        "displayName": "Amber Chip Text",
+        "canonical": "#f6c862",
+        "oklch": "oklch(85.4% 0.131 85.0)",
+        "tonalRamp": [
+          "#140900",
+          "#312200",
+          "#553e01",
+          "#7a5c10",
+          "#a27c18",
+          "#ca9e32",
+          "#f0c25c",
+          "#feedc9"
+        ],
+        "note": "Literal value in App.css (shell only); not a CSS custom property."
+      },
+      "ground": {
+        "role": "neutral",
+        "displayName": "Tinted Ground",
+        "canonical": "#eef2f6",
+        "oklch": "oklch(95.9% 0.007 247.9)",
+        "tonalRamp": [
+          "#090b0e",
+          "#222528",
+          "#3f4246",
+          "#5e6265",
+          "#7f8386",
+          "#a2a5a9",
+          "#c6cacd",
+          "#ebeff3"
+        ],
+        "cssVar": "--bg",
+        "theme": "light"
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Panel White",
+        "canonical": "#ffffff",
+        "oklch": "oklch(100.0% 0.000 89.9)",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ],
+        "cssVar": "--surface",
+        "theme": "light"
+      },
+      "surface-sunken": {
+        "role": "neutral",
+        "displayName": "Sunken Slate",
+        "canonical": "#f6f8fb",
+        "oklch": "oklch(97.8% 0.005 258.3)",
+        "tonalRamp": [
+          "#0a0b0d",
+          "#242527",
+          "#404244",
+          "#606164",
+          "#818285",
+          "#a3a5a8",
+          "#c7c9cc",
+          "#edeff1"
+        ],
+        "cssVar": "--surface-2",
+        "theme": "light"
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#dbe2ea",
+        "oklch": "oklch(91.0% 0.013 251.6)",
+        "tonalRamp": [
+          "#070c11",
+          "#20262b",
+          "#3d4349",
+          "#5c6269",
+          "#7d838a",
+          "#9fa6ad",
+          "#c3cad2",
+          "#e8eff7"
+        ],
+        "cssVar": "--border",
+        "theme": "light"
+      },
+      "border-strong": {
+        "role": "neutral",
+        "displayName": "Firm Hairline",
+        "canonical": "#c3cdd8",
+        "oklch": "oklch(84.4% 0.019 250.6)",
+        "tonalRamp": [
+          "#060c13",
+          "#1e262e",
+          "#3b434c",
+          "#59626c",
+          "#7a838e",
+          "#9da6b1",
+          "#c0cad5",
+          "#e5f0fb"
+        ],
+        "cssVar": "--border-strong",
+        "theme": "light"
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#111a24",
+        "oklch": "oklch(21.4% 0.024 251.6)",
+        "tonalRamp": [
+          "#050c15",
+          "#1d2630",
+          "#39434f",
+          "#58626f",
+          "#788491",
+          "#9ba6b4",
+          "#becbd9",
+          "#e3f0ff"
+        ],
+        "cssVar": "--text",
+        "theme": "light"
+      },
+      "ink-secondary": {
+        "role": "neutral",
+        "displayName": "Secondary Ink",
+        "canonical": "#3b4757",
+        "oklch": "oklch(39.4% 0.031 255.7)",
+        "tonalRamp": [
+          "#040b18",
+          "#1b2634",
+          "#374353",
+          "#566273",
+          "#768495",
+          "#98a6b9",
+          "#bccbde",
+          "#e5f0fe"
+        ],
+        "cssVar": "--text-2",
+        "theme": "light"
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Muted Ink",
+        "canonical": "#5e6b7c",
+        "oklch": "oklch(52.3% 0.031 255.2)",
+        "tonalRamp": [
+          "#030b18",
+          "#1b2634",
+          "#374353",
+          "#566273",
+          "#768495",
+          "#98a6b9",
+          "#bccbde",
+          "#e5f0fe"
+        ],
+        "cssVar": "--muted",
+        "theme": "light"
+      },
+      "action-blue": {
+        "role": "primary",
+        "displayName": "Action Blue",
+        "canonical": "#1d5fd6",
+        "oklch": "oklch(51.9% 0.195 261.2)",
+        "tonalRamp": [
+          "#00003a",
+          "#001c61",
+          "#053994",
+          "#1457cd",
+          "#397bf5",
+          "#71a4fd",
+          "#aecafb",
+          "#e6efff"
+        ],
+        "cssVar": "--accent",
+        "theme": "light"
+      },
+      "action-blue-hover": {
+        "role": "primary",
+        "displayName": "Action Blue Hover",
+        "canonical": "#174fb4",
+        "oklch": "oklch(45.7% 0.171 261.2)",
+        "tonalRamp": [
+          "#000039",
+          "#001d60",
+          "#00379a",
+          "#225ac0",
+          "#447ee7",
+          "#73a4fb",
+          "#accaff",
+          "#e6efff"
+        ],
+        "cssVar": "--accent-hover",
+        "theme": "light"
+      },
+      "action-blue-ink": {
+        "role": "primary",
+        "displayName": "Action Blue Ink",
+        "canonical": "#ffffff",
+        "oklch": "oklch(100.0% 0.000 89.9)",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ],
+        "cssVar": "--accent-ink",
+        "theme": "light"
+      },
+      "action-blue-soft": {
+        "role": "primary",
+        "displayName": "Action Blue Wash",
+        "canonical": "#e5eefc",
+        "oklch": "oklch(94.6% 0.021 259.2)",
+        "tonalRamp": [
+          "#060b14",
+          "#1f2530",
+          "#3b424e",
+          "#5a626e",
+          "#7b838f",
+          "#9da6b3",
+          "#c1cad7",
+          "#e6effd"
+        ],
+        "cssVar": "--accent-soft",
+        "theme": "light",
+        "note": "Also the light value of --user-bubble."
+      },
+      "ok": {
+        "role": "semantic",
+        "displayName": "Ok Green",
+        "canonical": "#13795b",
+        "oklch": "oklch(51.4% 0.100 167.1)",
+        "tonalRamp": [
+          "#001008",
+          "#012d20",
+          "#0a4e3a",
+          "#047355",
+          "#3a9576",
+          "#60b998",
+          "#85debc",
+          "#c0ffe4"
+        ],
+        "cssVar": "--ok",
+        "theme": "light"
+      },
+      "ok-soft": {
+        "role": "semantic",
+        "displayName": "Ok Wash",
+        "canonical": "#e3f4ed",
+        "oklch": "oklch(95.3% 0.020 169.3)",
+        "tonalRamp": [
+          "#030e0a",
+          "#1b2823",
+          "#384640",
+          "#56655f",
+          "#778680",
+          "#99a9a3",
+          "#bdcec7",
+          "#e2f3ec"
+        ],
+        "cssVar": "--ok-soft",
+        "theme": "light"
+      },
+      "warn": {
+        "role": "semantic",
+        "displayName": "Warn Ochre",
+        "canonical": "#9a5b00",
+        "oklch": "oklch(53.1% 0.119 65.1)",
+        "tonalRamp": [
+          "#190500",
+          "#391d00",
+          "#613600",
+          "#8a5208",
+          "#b27227",
+          "#d8954e",
+          "#ffb972",
+          "#ffead8"
+        ],
+        "cssVar": "--warn",
+        "theme": "light"
+      },
+      "warn-soft": {
+        "role": "semantic",
+        "displayName": "Warn Wash",
+        "canonical": "#fdf1dc",
+        "oklch": "oklch(96.2% 0.031 81.8)",
+        "tonalRamp": [
+          "#120a00",
+          "#2d2413",
+          "#4a412f",
+          "#6a604e",
+          "#8c816e",
+          "#afa490",
+          "#d3c8b3",
+          "#f9edd8"
+        ],
+        "cssVar": "--warn-soft",
+        "theme": "light"
+      },
+      "crit": {
+        "role": "semantic",
+        "displayName": "Crit Red",
+        "canonical": "#c22a2a",
+        "oklch": "oklch(53.3% 0.188 26.4)",
+        "tonalRamp": [
+          "#220000",
+          "#4e0003",
+          "#80020c",
+          "#b4171d",
+          "#dc4640",
+          "#fd746a",
+          "#ffb3aa",
+          "#fee9e6"
+        ],
+        "cssVar": "--crit",
+        "theme": "light"
+      },
+      "crit-soft": {
+        "role": "semantic",
+        "displayName": "Crit Wash",
+        "canonical": "#fce8e8",
+        "oklch": "oklch(94.7% 0.022 17.5)",
+        "tonalRamp": [
+          "#130708",
+          "#2f2121",
+          "#4d3d3e",
+          "#6d5c5d",
+          "#8f7d7d",
+          "#b2a0a0",
+          "#d7c4c4",
+          "#fde9e9"
+        ],
+        "cssVar": "--crit-soft",
+        "theme": "light"
+      },
+      "info": {
+        "role": "semantic",
+        "displayName": "Info Blue",
+        "canonical": "#2a62b8",
+        "oklch": "oklch(50.6% 0.148 259.0)",
+        "tonalRamp": [
+          "#00003c",
+          "#002058",
+          "#003c8e",
+          "#265eb4",
+          "#4881da",
+          "#70a5f8",
+          "#abcbfd",
+          "#e6effe"
+        ],
+        "cssVar": "--info",
+        "theme": "light"
+      },
+      "info-soft": {
+        "role": "semantic",
+        "displayName": "Info Wash",
+        "canonical": "#e6effb",
+        "oklch": "oklch(94.9% 0.019 255.5)",
+        "tonalRamp": [
+          "#060b13",
+          "#1f262e",
+          "#3b434c",
+          "#5a626c",
+          "#7b838e",
+          "#9da6b1",
+          "#c1cad6",
+          "#e6effb"
+        ],
+        "cssVar": "--info-soft",
+        "theme": "light"
+      },
+      "freeze": {
+        "role": "semantic",
+        "displayName": "Freeze Tint",
+        "canonical": "#cfe0f5",
+        "oklch": "oklch(90.0% 0.034 253.7)",
+        "tonalRamp": [
+          "#030b19",
+          "#192635",
+          "#354354",
+          "#546375",
+          "#748497",
+          "#97a7bb",
+          "#bacbe0",
+          "#e4f0fe"
+        ],
+        "cssVar": "--freeze",
+        "theme": "light"
+      },
+      "mild": {
+        "role": "neutral",
+        "displayName": "Mild Track",
+        "canonical": "#e8edf2",
+        "oklch": "oklch(94.4% 0.009 247.9)",
+        "tonalRamp": [
+          "#080c0f",
+          "#222529",
+          "#3e4246",
+          "#5d6266",
+          "#7e8387",
+          "#a1a6aa",
+          "#c5cacf",
+          "#eaeff4"
+        ],
+        "cssVar": "--mild",
+        "theme": "light"
+      },
+      "night-shell-navy": {
+        "role": "secondary",
+        "displayName": "Night Shell Navy",
+        "canonical": "#0b1d31",
+        "oklch": "oklch(22.7% 0.046 252.6)",
+        "tonalRamp": [
+          "#000b1e",
+          "#14263b",
+          "#30445a",
+          "#4f637b",
+          "#6f849e",
+          "#91a7c2",
+          "#b4cce7",
+          "#e3f0ff"
+        ],
+        "cssVar": "--shell",
+        "theme": "dark"
+      },
+      "night-shell-navy-raised": {
+        "role": "secondary",
+        "displayName": "Night Raised Navy",
+        "canonical": "#132b46",
+        "oklch": "oklch(28.5% 0.058 252.9)",
+        "tonalRamp": [
+          "#000a23",
+          "#0e2640",
+          "#2b4460",
+          "#496382",
+          "#6a85a5",
+          "#8ba8c9",
+          "#afccef",
+          "#e4f0fe"
+        ],
+        "cssVar": "--shell-2",
+        "theme": "dark"
+      },
+      "night-ground": {
+        "role": "neutral",
+        "displayName": "Night Tinted Ground",
+        "canonical": "#0b1119",
+        "oklch": "oklch(17.6% 0.019 255.8)",
+        "tonalRamp": [
+          "#060b13",
+          "#1f262e",
+          "#3b434c",
+          "#5a626c",
+          "#7b838e",
+          "#9da6b1",
+          "#c1cad6",
+          "#e6effc"
+        ],
+        "cssVar": "--bg",
+        "theme": "dark"
+      },
+      "night-surface": {
+        "role": "neutral",
+        "displayName": "Night Panel White",
+        "canonical": "#121a24",
+        "oklch": "oklch(21.5% 0.023 254.3)",
+        "tonalRamp": [
+          "#050c15",
+          "#1d2630",
+          "#3a434e",
+          "#58626e",
+          "#798390",
+          "#9ba6b4",
+          "#bfcad8",
+          "#e4f0fe"
+        ],
+        "cssVar": "--surface",
+        "theme": "dark"
+      },
+      "night-surface-sunken": {
+        "role": "neutral",
+        "displayName": "Night Sunken Slate",
+        "canonical": "#17212d",
+        "oklch": "oklch(24.4% 0.027 253.4)",
+        "tonalRamp": [
+          "#040c16",
+          "#1c2632",
+          "#384350",
+          "#576271",
+          "#778493",
+          "#9aa6b6",
+          "#bdcbdb",
+          "#e3f0ff"
+        ],
+        "cssVar": "--surface-2",
+        "theme": "dark"
+      },
+      "night-border": {
+        "role": "neutral",
+        "displayName": "Night Hairline",
+        "canonical": "#243142",
+        "oklch": "oklch(30.9% 0.036 255.4)",
+        "tonalRamp": [
+          "#030b1a",
+          "#192636",
+          "#354355",
+          "#546276",
+          "#748498",
+          "#97a7bc",
+          "#bacbe1",
+          "#e4f0fe"
+        ],
+        "cssVar": "--border",
+        "theme": "dark"
+      },
+      "night-border-strong": {
+        "role": "neutral",
+        "displayName": "Night Firm Hairline",
+        "canonical": "#324257",
+        "oklch": "oklch(37.4% 0.042 255.4)",
+        "tonalRamp": [
+          "#010b1c",
+          "#172639",
+          "#334358",
+          "#526379",
+          "#72849c",
+          "#94a7bf",
+          "#b8cbe5",
+          "#e5f0fe"
+        ],
+        "cssVar": "--border-strong",
+        "theme": "dark"
+      },
+      "night-ink": {
+        "role": "neutral",
+        "displayName": "Night Ink",
+        "canonical": "#e6edf5",
+        "oklch": "oklch(94.3% 0.013 251.6)",
+        "tonalRamp": [
+          "#070c11",
+          "#20262b",
+          "#3d4349",
+          "#5c6269",
+          "#7d838a",
+          "#9fa6ad",
+          "#c3cad2",
+          "#e8eff7"
+        ],
+        "cssVar": "--text",
+        "theme": "dark"
+      },
+      "night-ink-secondary": {
+        "role": "neutral",
+        "displayName": "Night Secondary Ink",
+        "canonical": "#c2cdda",
+        "oklch": "oklch(84.4% 0.022 252.5)",
+        "tonalRamp": [
+          "#050c14",
+          "#1e2630",
+          "#3a434e",
+          "#59626e",
+          "#79838f",
+          "#9ca6b3",
+          "#bfcad7",
+          "#e4f0fd"
+        ],
+        "cssVar": "--text-2",
+        "theme": "dark"
+      },
+      "night-ink-muted": {
+        "role": "neutral",
+        "displayName": "Night Muted Ink",
+        "canonical": "#8d9bad",
+        "oklch": "oklch(68.4% 0.031 254.7)",
+        "tonalRamp": [
+          "#030b18",
+          "#1b2634",
+          "#374353",
+          "#556273",
+          "#768495",
+          "#98a6b9",
+          "#bccbde",
+          "#e5f0fe"
+        ],
+        "cssVar": "--muted",
+        "theme": "dark"
+      },
+      "night-action-blue": {
+        "role": "primary",
+        "displayName": "Night Action Blue",
+        "canonical": "#4d8cf5",
+        "oklch": "oklch(65.0% 0.170 260.0)",
+        "tonalRamp": [
+          "#000039",
+          "#00205a",
+          "#013a91",
+          "#1d5bbf",
+          "#407fe6",
+          "#71a5fb",
+          "#abcbff",
+          "#e6effe"
+        ],
+        "cssVar": "--accent",
+        "theme": "dark"
+      },
+      "night-action-blue-hover": {
+        "role": "primary",
+        "displayName": "Night Action Blue Hover",
+        "canonical": "#6a9ff7",
+        "oklch": "oklch(70.4% 0.142 260.1)",
+        "tonalRamp": [
+          "#00003a",
+          "#001f5b",
+          "#0a3c8b",
+          "#2d5eb0",
+          "#4d81d6",
+          "#6fa5fd",
+          "#adcbfb",
+          "#e5efff"
+        ],
+        "cssVar": "--accent-hover",
+        "theme": "dark"
+      },
+      "night-action-blue-ink": {
+        "role": "primary",
+        "displayName": "Night Action Blue Ink",
+        "canonical": "#06111f",
+        "oklch": "oklch(17.5% 0.034 254.1)",
+        "tonalRamp": [
+          "#030b19",
+          "#192635",
+          "#364354",
+          "#546374",
+          "#758497",
+          "#97a7ba",
+          "#bbcbdf",
+          "#e5f0fe"
+        ],
+        "cssVar": "--accent-ink",
+        "theme": "dark"
+      },
+      "night-action-blue-soft": {
+        "role": "primary",
+        "displayName": "Night Action Blue Wash",
+        "canonical": "#15284a",
+        "oklch": "oklch(28.1% 0.068 261.1)",
+        "tonalRamp": [
+          "#000827",
+          "#112445",
+          "#2d4266",
+          "#4b6188",
+          "#6c83ab",
+          "#8da6d0",
+          "#b1caf6",
+          "#e6efff"
+        ],
+        "cssVar": "--accent-soft",
+        "theme": "dark"
+      },
+      "night-ok": {
+        "role": "semantic",
+        "displayName": "Night Ok Green",
+        "canonical": "#47c79a",
+        "oklch": "oklch(74.7% 0.131 166.0)",
+        "tonalRamp": [
+          "#001007",
+          "#002d1f",
+          "#034f38",
+          "#167255",
+          "#209872",
+          "#3cbf92",
+          "#68e4b6",
+          "#c3fee4"
+        ],
+        "cssVar": "--ok",
+        "theme": "dark"
+      },
+      "night-ok-soft": {
+        "role": "semantic",
+        "displayName": "Night Ok Wash",
+        "canonical": "#10301f",
+        "oklch": "oklch(27.9% 0.050 157.6)",
+        "tonalRamp": [
+          "#001004",
+          "#0c2c1b",
+          "#2a4a38",
+          "#496a56",
+          "#6a8c77",
+          "#8caf99",
+          "#afd3bd",
+          "#d4f9e2"
+        ],
+        "cssVar": "--ok-soft",
+        "theme": "dark"
+      },
+      "night-warn": {
+        "role": "semantic",
+        "displayName": "Night Warn Ochre",
+        "canonical": "#f0b04a",
+        "oklch": "oklch(79.9% 0.138 75.8)",
+        "tonalRamp": [
+          "#150800",
+          "#352000",
+          "#5a3b00",
+          "#825808",
+          "#ac760e",
+          "#d6972c",
+          "#fcbc57",
+          "#feecd2"
+        ],
+        "cssVar": "--warn",
+        "theme": "dark"
+      },
+      "night-warn-soft": {
+        "role": "semantic",
+        "displayName": "Night Warn Wash",
+        "canonical": "#33250c",
+        "oklch": "oklch(27.5% 0.044 79.6)",
+        "tonalRamp": [
+          "#150800",
+          "#302209",
+          "#4e3f26",
+          "#6f5f45",
+          "#908065",
+          "#b4a287",
+          "#d9c7aa",
+          "#feecce"
+        ],
+        "cssVar": "--warn-soft",
+        "theme": "dark"
+      },
+      "night-crit": {
+        "role": "semantic",
+        "displayName": "Night Crit Red",
+        "canonical": "#ff6b6b",
+        "oklch": "oklch(71.2% 0.181 22.8)",
+        "tonalRamp": [
+          "#210001",
+          "#4d0009",
+          "#7e0819",
+          "#b11d2c",
+          "#d9484c",
+          "#fb7674",
+          "#fdb3af",
+          "#ffe9e7"
+        ],
+        "cssVar": "--crit",
+        "theme": "dark"
+      },
+      "night-crit-soft": {
+        "role": "semantic",
+        "displayName": "Night Crit Wash",
+        "canonical": "#3a1416",
+        "oklch": "oklch(25.2% 0.060 19.3)",
+        "tonalRamp": [
+          "#1e0003",
+          "#3e1719",
+          "#5e3435",
+          "#805353",
+          "#a47474",
+          "#c89696",
+          "#eebab9",
+          "#fee9e8"
+        ],
+        "cssVar": "--crit-soft",
+        "theme": "dark"
+      },
+      "night-info": {
+        "role": "semantic",
+        "displayName": "Night Info Blue",
+        "canonical": "#7aa7f2",
+        "oklch": "oklch(72.7% 0.120 260.3)",
+        "tonalRamp": [
+          "#000037",
+          "#002058",
+          "#173e81",
+          "#3760a5",
+          "#5782ca",
+          "#78a5f0",
+          "#accbfd",
+          "#e6effe"
+        ],
+        "cssVar": "--info",
+        "theme": "dark"
+      },
+      "night-info-soft": {
+        "role": "semantic",
+        "displayName": "Night Info Wash",
+        "canonical": "#14243f",
+        "oklch": "oklch(26.2% 0.055 260.3)",
+        "tonalRamp": [
+          "#010922",
+          "#152540",
+          "#314260",
+          "#4f6281",
+          "#6f83a4",
+          "#91a6c8",
+          "#b5caee",
+          "#e5efff"
+        ],
+        "cssVar": "--info-soft",
+        "theme": "dark"
+      },
+      "night-freeze": {
+        "role": "semantic",
+        "displayName": "Night Freeze Tint",
+        "canonical": "#1d3554",
+        "oklch": "oklch(32.6% 0.063 255.5)",
+        "tonalRamp": [
+          "#000925",
+          "#0e2543",
+          "#2a4363",
+          "#496385",
+          "#6984a8",
+          "#8ba7cd",
+          "#aeccf2",
+          "#e5f0fe"
+        ],
+        "cssVar": "--freeze",
+        "theme": "dark"
+      },
+      "night-mild": {
+        "role": "neutral",
+        "displayName": "Night Mild Track",
+        "canonical": "#1f2a37",
+        "oklch": "oklch(28.1% 0.029 253.0)",
+        "tonalRamp": [
+          "#040c17",
+          "#1b2633",
+          "#374351",
+          "#566371",
+          "#778493",
+          "#99a7b7",
+          "#bccbdc",
+          "#e4f0fe"
+        ],
+        "cssVar": "--mild",
+        "theme": "dark"
+      },
+      "night-user-bubble": {
+        "role": "primary",
+        "displayName": "Night User Bubble",
+        "canonical": "#16294a",
+        "oklch": "oklch(28.4% 0.066 260.7)",
+        "tonalRamp": [
+          "#000826",
+          "#112445",
+          "#2d4265",
+          "#4c6287",
+          "#6c83aa",
+          "#8ea6cf",
+          "#b1caf5",
+          "#e6effe"
+        ],
+        "cssVar": "--user-bubble",
+        "theme": "dark"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Current temperature readout only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Page titles."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Field report document title."
+      },
+      "title-panel": {
+        "displayName": "Panel Title",
+        "purpose": "Panel headers, led by a 16px muted icon."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Base text; tabular numerals on at root."
+      },
+      "body-chat": {
+        "displayName": "Chat Body",
+        "purpose": "Conversation bubbles, pre-wrap."
+      },
+      "body-sm": {
+        "displayName": "Small Body",
+        "purpose": "Panel copy, buttons, tabs, lists."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Form field labels, mic label, report field headings."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Message meta, badges, sub-heads, source notes."
+      },
+      "micro": {
+        "displayName": "Micro",
+        "purpose": "Timeline Now and alert flags."
+      }
+    },
+    "themes": {
+      "light": {
+        "selector": ":root",
+        "note": "Default; projector and daylight."
+      },
+      "dark": {
+        "selector": ":root[data-theme='dark'] and @media (prefers-color-scheme: dark) :root:not([data-theme='light'])",
+        "note": "Night work; tokens prefixed night- in the frontmatter."
+      }
+    },
+    "shadows": [
+      {
+        "name": "panel-rest",
+        "value": "0 1px 2px rgb(16 32 56 / 0.06), 0 2px 8px rgb(16 32 56 / 0.05)",
+        "purpose": "Every panel, light theme."
+      },
+      {
+        "name": "panel-rest-night",
+        "value": "0 1px 2px rgb(0 0 0 / 0.35)",
+        "purpose": "Every panel, dark theme; borders carry separation."
+      },
+      {
+        "name": "input-focus-halo",
+        "value": "0 0 0 3px var(--accent-soft)",
+        "purpose": "Focused input, with Action Blue border."
+      },
+      {
+        "name": "job-pill-active",
+        "value": "inset 0 0 0 1px rgb(255 255 255 / 0.18)",
+        "purpose": "Job pill when the job view is current."
+      },
+      {
+        "name": "switch-knob",
+        "value": "0 1px 2px rgb(0 0 0 / 0.25)",
+        "purpose": "Switch knob."
+      },
+      {
+        "name": "mic-live-pulse",
+        "value": "0 0 0 0 rgb(194 42 42 / 0.35) to 0 0 0 8px rgb(194 42 42 / 0)",
+        "purpose": "Mic while listening, 1.6s ease-in-out loop."
+      }
+    ],
+    "focus": {
+      "value": "2px solid var(--focus)",
+      "offset": "2px",
+      "purpose": "Global :focus-visible ring; #1d5fd6 light, #6a9ff7 dark."
+    },
+    "motion": [
+      {
+        "name": "state-fast",
+        "value": "150ms ease-out",
+        "purpose": "Colour, border and shadow transitions on buttons, nav, inputs."
+      },
+      {
+        "name": "press",
+        "value": "120ms ease-out, scale(0.98)",
+        "purpose": "Mic press."
+      },
+      {
+        "name": "switch-slide",
+        "value": "180ms cubic-bezier(0.2, 0.8, 0.2, 1)",
+        "purpose": "Switch knob travel."
+      },
+      {
+        "name": "mic-live",
+        "value": "1.6s ease-in-out infinite",
+        "purpose": "Listening pulse ring."
+      },
+      {
+        "name": "thinking-dots",
+        "value": "1.2s ease-in-out infinite, 0.15s stagger",
+        "purpose": "Assistant thinking indicator."
+      },
+      {
+        "name": "skeleton-shimmer",
+        "value": "1.4s ease-in-out infinite",
+        "purpose": "Loading skeleton lines."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "1ms",
+        "purpose": "All animations and transitions under prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "rail-narrow",
+        "value": "max-width: 1100px",
+        "purpose": "Rail 400px to 340px."
+      },
+      {
+        "name": "short-landscape",
+        "value": "min-width: 901px and max-height: 820px",
+        "purpose": "Tightened rail so conditions stay above the fold."
+      },
+      {
+        "name": "single-column",
+        "value": "max-width: 900px",
+        "purpose": "Rail becomes the Site & asset tab; dispatch strip; full-width 64px mic."
+      },
+      {
+        "name": "phone",
+        "value": "max-width: 520px",
+        "purpose": "Brand name hidden; fact rows stack."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Single main action per region: Start job, Send, Finish job.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">Start job</button>",
+      "css": ".ds-btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; height:40px; padding:0 16px; border-radius:var(--radius-sm,7px); border:1px solid transparent; font-family:'Public Sans Variable', system-ui, 'Segoe UI', Roboto, sans-serif; font-size:0.875rem; font-weight:600; cursor:pointer; transition:background 150ms ease-out, border-color 150ms ease-out, color 150ms ease-out; } .ds-btn:focus-visible { outline:2px solid var(--focus,#1d5fd6); outline-offset:2px; } .ds-btn-primary { background:var(--accent,#1d5fd6); color:var(--accent-ink,#fff); } .ds-btn-primary:hover { background:var(--accent-hover,#174fb4); } .ds-btn-primary:disabled { opacity:0.55; cursor:not-allowed; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Outlined surface button for non-primary actions, e.g. Finish once the report is saved.",
+      "html": "<button class=\"ds-btn ds-btn-secondary\">Report saved</button>",
+      "css": ".ds-btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; height:40px; padding:0 16px; border-radius:var(--radius-sm,7px); border:1px solid transparent; font-family:'Public Sans Variable', system-ui, 'Segoe UI', Roboto, sans-serif; font-size:0.875rem; font-weight:600; cursor:pointer; transition:background 150ms ease-out, border-color 150ms ease-out, color 150ms ease-out; } .ds-btn:focus-visible { outline:2px solid var(--focus,#1d5fd6); outline-offset:2px; } .ds-btn-secondary { background:var(--surface,#fff); border-color:var(--border-strong,#c3cdd8); color:var(--text,#111a24); } .ds-btn-secondary:hover { background:var(--surface-2,#f6f8fb); }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Low-weight inline action: View all, Stop speaking.",
+      "html": "<button class=\"ds-btn ds-btn-ghost\">View all</button>",
+      "css": ".ds-btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; height:40px; padding:0 16px; border-radius:var(--radius-sm,7px); border:1px solid transparent; font-family:'Public Sans Variable', system-ui, 'Segoe UI', Roboto, sans-serif; font-size:0.875rem; font-weight:600; cursor:pointer; transition:background 150ms ease-out, border-color 150ms ease-out, color 150ms ease-out; } .ds-btn:focus-visible { outline:2px solid var(--focus,#1d5fd6); outline-offset:2px; } .ds-btn-ghost { background:transparent; color:var(--accent,#1d5fd6); } .ds-btn-ghost:hover { background:var(--accent-soft,#e5eefc); }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Labelled field with blue border and wash halo on focus.",
+      "html": "<label class=\"ds-field\"><span>Technician</span><input class=\"ds-input\" value=\"Jordan Reyes\"></label>",
+      "css": ".ds-field { display:flex; flex-direction:column; gap:6px; font-family:'Public Sans Variable', system-ui, 'Segoe UI', Roboto, sans-serif; } .ds-field > span { font-size:0.8125rem; font-weight:600; color:var(--text-2,#3b4757); } .ds-input { min-height:42px; padding:9px 12px; border:1px solid var(--border-strong,#c3cdd8); border-radius:var(--radius-sm,7px); background:var(--surface,#fff); color:var(--text,#111a24); font:inherit; font-size:0.9375rem; caret-color:var(--accent,#1d5fd6); transition:border-color 150ms ease-out, box-shadow 150ms ease-out; } .ds-input:focus { outline:none; border-color:var(--accent,#1d5fd6); box-shadow:0 0 0 3px var(--accent-soft,#e5eefc); }"
+    },
+    {
+      "name": "App Bar",
+      "kind": "nav",
+      "refersTo": "app-bar",
+      "description": "Navy shell with amber brand mark, job pill and right-aligned nav.",
+      "html": "<header class=\"ds-appbar\"><span class=\"ds-brand\"><span class=\"ds-mark\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"currentColor\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z\"/></svg></span>Field Assistant</span><span class=\"ds-pill\"><i class=\"ds-dot\"></i>Harlan Creek Substation &middot; B-12<span class=\"ds-chip\">Scenario</span></span><nav class=\"ds-nav\"><button>New job</button><button class=\"is-active\">Field reports</button></nav></header>",
+      "css": ".ds-appbar { display:flex; align-items:center; gap:16px; height:56px; padding:0 16px; background:var(--shell,#0f2742); color:var(--shell-text,#e9f0f8); font-family:'Public Sans Variable', system-ui, 'Segoe UI', Roboto, sans-serif; } .ds-brand { display:flex; align-items:center; gap:10px; font-weight:650; letter-spacing:-0.01em; } .ds-mark { display:grid; place-items:center; width:28px; height:28px; border-radius:7px; background:#f2b230; color:#1c1300; } .ds-pill { display:flex; align-items:center; gap:10px; height:36px; padding:0 12px; border-radius:999px; background:var(--shell-2,#173556); font-size:0.875rem; font-weight:550; } .ds-dot { width:8px; height:8px; border-radius:50%; background:#f2b230; } .ds-chip { padding:1px 8px; border-radius:999px; background:rgb(242 178 48 / 0.18); color:#f6c862; font-size:0.75rem; font-weight:600; } .ds-nav { margin-left:auto; display:flex; gap:4px; } .ds-nav button { height:36px; padding:0 12px; border:0; border-radius:7px; background:none; color:var(--shell-muted,#9fb3c8); font:inherit; font-size:0.875rem; font-weight:550; cursor:pointer; transition:background 150ms ease-out, color 150ms ease-out; } .ds-nav button:hover, .ds-nav button.is-active { background:var(--shell-2,#173556); color:var(--shell-text,#e9f0f8); } .ds-nav button:focus-visible { outline:2px solid var(--focus,#1d5fd6); outline-offset:2px; }"
+    },
+    {
+      "name": "Job Tabs",
+      "kind": "nav",
+      "refersTo": "tab",
+      "description": "Tab bar over the job main column; selected tab takes the blue wash.",
+      "html": "<div class=\"ds-tabs\" role=\"tablist\"><button class=\"ds-tab\" role=\"tab\" aria-selected=\"true\">Assistant</button><button class=\"ds-tab\" role=\"tab\" aria-selected=\"false\">Field report</button></div>",
+      "css": ".ds-tabs { display:flex; gap:4px; padding:10px 20px; background:var(--surface,#fff); border-bottom:1px solid var(--border,#dbe2ea); font-family:'Public Sans Variable', system-ui, 'Segoe UI', Roboto, sans-serif; } .ds-tab { height:34px; padding:0 12px; border:0; border-radius:7px; background:transparent; color:var(--muted,#5e6b7c); font:inherit; font-size:0.875rem; font-weight:600; cursor:pointer; } .ds-tab:hover { color:var(--text,#111a24); background:var(--surface-2,#f6f8fb); } .ds-tab[aria-selected='true'] { color:var(--accent,#1d5fd6); background:var(--accent-soft,#e5eefc); } .ds-tab:focus-visible { outline:2px solid var(--focus,#1d5fd6); outline-offset:2px; }"
+    },
+    {
+      "name": "Status Badges",
+      "kind": "chip",
+      "refersTo": "badge-ok",
+      "description": "State-only tone pills: soft wash behind strong ink.",
+      "html": "<span class=\"ds-badge ds-ok\">Can stay in</span> <span class=\"ds-badge ds-warn\">Conditional</span> <span class=\"ds-badge ds-crit\">Remove</span> <span class=\"ds-badge ds-info\">Assessing</span>",
+      "css": ".ds-badge { display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:999px; font-family:'Public Sans Variable', system-ui, 'Segoe UI', Roboto, sans-serif; font-size:0.75rem; font-weight:600; white-space:nowrap; } .ds-ok { background:var(--ok-soft,#e3f4ed); color:var(--ok,#13795b); } .ds-warn { background:var(--warn-soft,#fdf1dc); color:var(--warn,#9a5b00); } .ds-crit { background:var(--crit-soft,#fce8e8); color:var(--crit,#c22a2a); } .ds-info { background:var(--info-soft,#e6effb); color:var(--info,#2a62b8); }"
+    },
+    {
+      "name": "Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Bordered, softly shadowed container with a header; shown with a dispatch status line.",
+      "html": "<section class=\"ds-panel\"><header class=\"ds-panel-head\"><h2>Dispatch status</h2></header><div class=\"ds-panel-body\"><div class=\"ds-status\">Conditional<time>2:30 AM</time></div><p>B-12 can stay in only if the cabinet heater is restored.</p></div></section>",
+      "css": ".ds-panel { background:var(--surface,#fff); border:1px solid var(--border,#dbe2ea); border-radius:var(--radius,10px); box-shadow:var(--shadow,0 1px 2px rgb(16 32 56 / 0.06), 0 2px 8px rgb(16 32 56 / 0.05)); font-family:'Public Sans Variable', system-ui, 'Segoe UI', Roboto, sans-serif; color:var(--text,#111a24); } .ds-panel-head { display:flex; align-items:center; min-height:48px; padding:0 16px; border-bottom:1px solid var(--border,#dbe2ea); } .ds-panel-head h2 { margin:0; font-size:0.875rem; font-weight:650; color:var(--text-2,#3b4757); } .ds-panel-body { display:flex; flex-direction:column; gap:12px; padding:16px; } .ds-panel-body p { margin:0; font-weight:600; line-height:1.4; } .ds-status { display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:7px; background:var(--warn-soft,#fdf1dc); color:var(--warn,#9a5b00); font-weight:650; } .ds-status time { margin-left:auto; font-weight:500; }"
+    },
+    {
+      "name": "Tap-to-talk Mic",
+      "kind": "custom",
+      "refersTo": "mic-button",
+      "description": "Signature voice control; turns crit red with a pulsing ring while listening.",
+      "html": "<button class=\"ds-mic\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z\"/><path d=\"M19 10v2a7 7 0 0 1-14 0v-2\"/><line x1=\"12\" x2=\"12\" y1=\"19\" y2=\"22\"/></svg><span>Tap to talk</span></button> <button class=\"ds-mic is-live\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z\"/><path d=\"M19 10v2a7 7 0 0 1-14 0v-2\"/><line x1=\"12\" x2=\"12\" y1=\"19\" y2=\"22\"/></svg><span>Listening</span></button>",
+      "css": ".ds-mic { display:inline-flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; width:128px; height:82px; border:0; border-radius:14px; background:var(--accent,#1d5fd6); color:var(--accent-ink,#fff); font-family:'Public Sans Variable', system-ui, 'Segoe UI', Roboto, sans-serif; font-size:0.8125rem; font-weight:650; cursor:pointer; transition:background 150ms ease-out, transform 120ms ease-out; } .ds-mic:hover { background:var(--accent-hover,#174fb4); } .ds-mic:active { transform:scale(0.98); } .ds-mic:focus-visible { outline:2px solid var(--focus,#1d5fd6); outline-offset:2px; } .ds-mic.is-live { background:var(--crit,#c22a2a); color:#fff; animation:ds-live 1.6s ease-in-out infinite; } @keyframes ds-live { 0%,100% { box-shadow:0 0 0 0 rgb(194 42 42 / 0.35); } 50% { box-shadow:0 0 0 8px rgb(194 42 42 / 0); } }"
+    },
+    {
+      "name": "Storm-window Timeline",
+      "kind": "custom",
+      "description": "Signature: forecast periods on one axis, freezing tinted, alert window as a crit band, Now marked.",
+      "html": "<div class=\"ds-tl\"><div class=\"ds-tl-marks\"><span class=\"ds-now\" style=\"left:1%\">Now</span><span class=\"ds-alert\" style=\"left:38%\">Warning 6:00 PM</span></div><div class=\"ds-tl-track\"><div class=\"ds-seg\" style=\"left:0;width:33.3%\">24&deg;</div><div class=\"ds-seg is-freezing\" style=\"left:33.3%;width:33.3%\">6&deg;</div><div class=\"ds-seg is-freezing\" style=\"left:66.6%;width:33.4%\">19&deg;</div><div class=\"ds-band\" style=\"left:38%;width:62%\"></div><div class=\"ds-nowline\" style=\"left:1%\"></div></div></div>",
+      "css": ".ds-tl { display:grid; gap:6px; width:320px; font-family:'Public Sans Variable', system-ui, 'Segoe UI', Roboto, sans-serif; } .ds-tl-marks { position:relative; height:18px; } .ds-tl-marks span { position:absolute; bottom:0; padding:0 5px; border-radius:3px; font-size:0.6875rem; font-weight:700; line-height:16px; white-space:nowrap; } .ds-now { background:var(--text,#111a24); color:var(--surface,#fff); } .ds-alert { background:var(--crit-soft,#fce8e8); color:var(--crit,#c22a2a); } .ds-tl-track { position:relative; height:44px; border-radius:6px; background:var(--mild,#e8edf2); overflow:hidden; } .ds-seg { position:absolute; top:0; bottom:0; display:flex; align-items:center; padding-left:6px; border-right:1px solid var(--surface,#fff); background:var(--mild,#e8edf2); font-size:0.75rem; font-weight:650; color:var(--text-2,#3b4757); } .ds-seg.is-freezing { background:var(--freeze,#cfe0f5); } .ds-band { position:absolute; bottom:0; height:6px; background:var(--crit,#c22a2a); } .ds-nowline { position:absolute; top:0; bottom:0; width:2px; margin-left:-1px; background:var(--text,#111a24); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Night-Shift Console",
+    "overview": "A working operations console for one live job, built to be read by a technician in a cold cab at 2 AM and by a dispatcher across the room. The conversation holds the centre; the facts dispatch needs (status, conditions, asset record, surroundings) are pinned in a sunken right rail beside it. The look is the professional dashboard the user asked for, played straight: a navy app bar with a single amber utility mark, cool tinted neutral grounds, white (or deep slate) panels with hairline borders, and one blue for action.\n\nDensity is moderate and legible rather than packed: 16px body, 0.875rem panel copy, generous 40px+ controls on the paths a gloved hand takes. Colour is quiet until it means something; ok, warn, crit and info tones appear only where they report state. Light and dark are first-class equals. Light serves projectors and daylight; dark serves night work, and the shell deepens rather than inverts so the app bar keeps its edge against the darker ground.\n\nThe system refuses the chatbot-in-a-card page and the KPI-tile dashboard: no hero metrics, no floating chat widget, no decorative colour.",
+    "keyCharacteristics": [
+      "Navy shell in both themes, amber reserved for the shell",
+      "One action blue; semantic tones only on state",
+      "Public Sans throughout, tabular numerals everywhere",
+      "10px panels, 1px borders, soft shadow that all but vanishes at night",
+      "Conversation centre, 400px fact rail right, tabs below 900px",
+      "Storm-window timeline as the signature data component"
+    ],
+    "rules": [
+      {
+        "name": "The Navy Shell Rule",
+        "body": "The app bar is navy in both themes. Dark mode deepens it (to `night-shell-navy`); it never flips to a surface colour.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Blue Rule",
+        "body": "Action Blue is the only accent. It marks what can be done or what is selected, never decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The State-Only Tone Rule",
+        "body": "Ok, warn, crit and info appear only on badges, the dispatch status line, the narrow dispatch strip, weather alert boxes, error messages and the timeline. Always soft wash behind strong ink of the same tone; never a solid tone fill for body content.",
+        "section": "colors"
+      },
+      {
+        "name": "The Amber Stays Up Top Rule",
+        "body": "Utility Amber belongs to the shell (brand mark, Scenario chip, live-dot). Content grounds never use it; warnings in content use `warn`.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Everything Rule",
+        "body": "`font-feature-settings: 'tnum' 1` is set at the root. Temperatures, times, onset countdowns and IDs align without extra classes.",
+        "section": "typography"
+      },
+      {
+        "name": "The Sentence Case Rule",
+        "body": "Every heading, label, tab, button and badge is sentence case. No uppercase, no letter-spaced labels.",
+        "section": "typography"
+      },
+      {
+        "name": "The Border Carries Night Rule",
+        "body": "Never rely on shadow to separate surfaces; at night the shadow is nearly gone, so every container needs its 1px border or a tonal step.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep the app bar navy in both themes and deepen it at night.",
+      "Do use Action Blue only for actions, selection, focus and the user's voice.",
+      "Do pair every semantic tone as soft wash behind strong ink, and map dispatch states to ok / warn / crit / info.",
+      "Do give every container a 1px border so it still separates when the night shadow disappears.",
+      "Do keep glove-path controls 40px or taller (buttons 40, inputs 42, Tap-to-talk 64 when narrow).",
+      "Do lead every panel title with a 16px muted line icon from the same set.",
+      "Do cite the source under data panels in a 0.75rem muted note (Weather, Map).",
+      "Do honour `prefers-reduced-motion`; all animation collapses to 1ms."
+    ],
+    "donts": [
+      "Don't introduce a second accent colour or use amber on content grounds.",
+      "Don't build KPI tiles or hero metric cards; facts live in panels as lists, fact rows and the timeline.",
+      "Don't put the assistant in a floating chat card; the conversation is the main column.",
+      "Don't use uppercase or letter-spaced labels; everything is sentence case.",
+      "Don't add a second typeface or a display face; Public Sans carries all levels.",
+      "Don't colour content with ok / warn / crit / info unless it reports state."
+    ]
+  }
+}

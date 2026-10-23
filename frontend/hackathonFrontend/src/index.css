@@ -35,6 +35,10 @@
   --mild: #e8edf2;
 
   --user-bubble: #e5eefc;
+  --call: #15803d;
+  --call-hover: #116a32;
+  --danger: #c22a2a;
+  --danger-hover: #a52222;
   --focus: #1d5fd6;
   --shadow: 0 1px 2px rgb(16 32 56 / 0.06), 0 2px 8px rgb(16 32 56 / 0.05);
   --radius: 10px;

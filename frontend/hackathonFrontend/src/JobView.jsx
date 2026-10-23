@@ -1,11 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
-import { ClipboardCheck, Mic, SendHorizontal, Square, Volume2, VolumeX } from 'lucide-react'
-import { api } from './api'
+import { ClipboardCheck, Mic, MicOff, Phone, PhoneOff, SendHorizontal, Square, Volume2, VolumeX } from 'lucide-react'
+import { api, transcribe } from './api'
+import { useCall } from './useCall'
 import { useSpeech } from './useSpeech'
 import { AssetPanel, ConditionsPanel, DispatchPanel, DispatchStrip, SurroundingsPanel } from './panels'
 import { formatClock } from './format'
 import { ReportDocument } from './reports'
 import { Switch } from './ui'
+
+function formatDuration(sec) {
+  return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`
+}
 
 const SCENARIO_NOW = Date.parse('2027-01-19T02:30:00-05:00')
 
@@ -40,13 +45,41 @@ export default function JobView({ job, assets, onDispatch }) {
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
   const [voiceOut, setVoiceOut] = useState(true)
-  const [handsFree, setHandsFree] = useState(false)
+  const [callTranscribing, setCallTranscribing] = useState(false)
+  const [callError, setCallError] = useState('')
+  const [callStartedAt, setCallStartedAt] = useState(null)
+  const [, setTick] = useState(0)
   const [tab, setTab] = useState('chat')
   const bottomRef = useRef(null)
   const lastReplyRef = useRef(null)
   const sendRef = useRef(null)
 
   const speech = useSpeech({ onFinalTranscript: (t) => sendRef.current(t) })
+  const call = useCall({
+    assistantSpeakingRef: speech.speakingRef,
+    // The tech started talking over the assistant: stop speaking and listen.
+    onBargeIn: () => speech.stopSpeaking(),
+    onUtterance: async (wav) => {
+      setCallTranscribing(true)
+      try {
+        const text = (await transcribe(wav)).trim()
+        if (text) sendRef.current(text, true)
+        else call.resume()
+      } catch (e) {
+        setCallError(e.message)
+        call.resume()
+      } finally {
+        setCallTranscribing(false)
+      }
+    },
+  })
+
+  // Re-render once a second so the call timer moves.
+  useEffect(() => {
+    if (!call.active) return
+    const id = setInterval(() => setTick((t) => t + 1), 1000)
+    return () => clearInterval(id)
+  }, [call.active])
   const asset = assets.find((a) => a.asset_id === job.asset_id)
   const nowMs = clockMs()
 
@@ -81,30 +114,69 @@ export default function JobView({ job, assets, onDispatch }) {
       setReport(res.report)
       setTab('report')
     }
-    if (voiceOut) speech.speak(res.reply, handsFree && !res.report ? speech.listen : undefined)
-    else if (handsFree && !res.report) speech.listen()
+    if (call.active) {
+      // On a call every reply is spoken, and the mic listens straight away so the tech can cut in.
+      speech.speak(res.reply)
+      call.resume()
+    } else if (voiceOut) {
+      speech.speak(res.reply)
+    }
   }
 
-  async function run(userText, call) {
-    if (busy) return
+  async function run(userText, request) {
+    if (busy) {
+      if (call.active) call.resume()
+      return
+    }
     setMessages((m) => [...m, { role: 'user', text: userText, time: now() }])
     setBusy(true)
     setTab((t) => (t === 'report' ? t : 'chat'))
     try {
-      apply(await call())
+      apply(await request())
     } catch (e) {
       setMessages((m) => [...m, { role: 'error', text: e.message }])
+      if (call.active) call.resume()
     } finally {
       setBusy(false)
     }
   }
 
-  function send(text) {
+  function send(text, viaCall = false) {
     const msg = text.trim()
     if (!msg) return
-    setInput('')
-    run(msg, () => api.chat(job.session_id, msg))
+    if (!viaCall) setInput('')
+    run(msg, () => api.chat(job.session_id, msg, viaCall || call.active))
   }
+
+  async function startCall() {
+    setCallError('')
+    if (speech.listening) speech.stopListening()
+    await call.start()
+    setCallStartedAt(Date.now())
+    speech.speak("I'm here. Go ahead whenever you're ready.")
+  }
+
+  function endCall() {
+    call.stop()
+    speech.stopSpeaking()
+    setCallStartedAt(null)
+  }
+
+  const callElapsed = callStartedAt ? Math.floor((Date.now() - callStartedAt) / 1000) : 0
+  const callStatus =
+    call.phase === 'connecting'
+      ? 'Connecting microphone…'
+      : call.phase === 'muted'
+        ? 'Muted. Unmute to talk.'
+        : call.phase === 'capturing'
+          ? 'Hearing you…'
+          : callTranscribing
+            ? 'Got it, transcribing…'
+            : busy
+              ? 'Thinking…'
+              : speech.speaking
+                ? 'Speaking. Talk any time to cut in.'
+                : 'Listening. Go ahead.'
   useEffect(() => {
     sendRef.current = send
   })
@@ -116,7 +188,7 @@ export default function JobView({ job, assets, onDispatch }) {
     : speech.transcribing
       ? 'Transcribing…'
       : speech.supported
-        ? 'Tap to talk'
+        ? 'Push to talk'
         : 'Voice input unavailable'
 
   return (
@@ -125,8 +197,8 @@ export default function JobView({ job, assets, onDispatch }) {
         {[
           ['chat', 'Assistant'],
           ['site', 'Site & asset'],
-          ['report', 'Report'],
-        ].map(([id, label]) => (
+          ['report', 'Field report', 'Report'],
+        ].map(([id, label, short]) => (
           <button
             key={id}
             role="tab"
@@ -135,7 +207,14 @@ export default function JobView({ job, assets, onDispatch }) {
             onClick={() => setTab(id)}
             disabled={id === 'report' && !report}
           >
-            {label}
+            {short ? (
+              <>
+                <span className="wide-only">{label}</span>
+                <span className="narrow-only-inline">{short}</span>
+              </>
+            ) : (
+              label
+            )}
           </button>
         ))}
         <div className="job-tabs-end">
@@ -183,16 +262,49 @@ export default function JobView({ job, assets, onDispatch }) {
               <div ref={bottomRef} />
             </div>
 
-            <div className="composer">
-              <button
-                className={`mic-btn ${speech.listening ? 'is-live' : ''}`}
-                onClick={() => (speech.listening ? speech.stopListening() : speech.listen())}
-                disabled={!speech.supported || busy || speech.transcribing}
-                aria-label={micLabel}
-              >
-                {speech.listening ? <Square size={22} fill="currentColor" /> : <Mic size={24} />}
-                <span>{micLabel}</span>
-              </button>
+            <div className={`composer ${call.active ? 'in-call' : ''}`}>
+              {call.active ? (
+                <div className="call-bar" role="status" aria-live="polite">
+                  <div className={`call-orb phase-${call.phase}`} style={{ '--level': call.level }} aria-hidden>
+                    <Phone size={20} />
+                  </div>
+                  <div className="call-info">
+                    <strong>
+                      On call <span className="num muted">{formatDuration(callElapsed)}</span>
+                    </strong>
+                    <span>{callStatus}</span>
+                  </div>
+                  <div className="call-actions">
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => call.mute(call.phase !== 'muted')}
+                      aria-pressed={call.phase === 'muted'}
+                    >
+                      {call.phase === 'muted' ? <MicOff size={16} aria-hidden /> : <Mic size={16} aria-hidden />}
+                      {call.phase === 'muted' ? 'Unmute' : 'Mute'}
+                    </button>
+                    <button className="btn btn-danger" onClick={endCall}>
+                      <PhoneOff size={16} aria-hidden /> End call
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="voice-actions">
+                  <button className="call-btn" onClick={startCall} disabled={!navigator.mediaDevices}>
+                    <Phone size={22} aria-hidden />
+                    <span>Start call</span>
+                  </button>
+                  <button
+                    className={`ptt-btn ${speech.listening ? 'is-live' : ''}`}
+                    onClick={() => (speech.listening ? speech.stopListening() : speech.listen())}
+                    disabled={!speech.supported || busy || speech.transcribing}
+                    aria-label={micLabel}
+                  >
+                    {speech.listening ? <Square size={14} fill="currentColor" /> : <Mic size={16} />}
+                    <span>{micLabel}</span>
+                  </button>
+                </div>
+              )}
               <form
                 className="composer-input"
                 onSubmit={(e) => {
@@ -211,18 +323,19 @@ export default function JobView({ job, assets, onDispatch }) {
                 </button>
               </form>
               <div className="composer-opts">
-                <Switch checked={voiceOut} onChange={setVoiceOut}>
-                  Read replies aloud
-                </Switch>
-                <Switch checked={handsFree} onChange={setHandsFree} disabled={!speech.supported}>
-                  Hands-free
-                </Switch>
+                {!call.active && (
+                  <Switch checked={voiceOut} onChange={setVoiceOut}>
+                    Read replies aloud
+                  </Switch>
+                )}
                 {speech.speaking && (
                   <button className="btn btn-ghost btn-sm" onClick={speech.stopSpeaking}>
                     <VolumeX size={15} aria-hidden /> Stop speaking
                   </button>
                 )}
-                {speech.error && <span className="field-error">{speech.error}</span>}
+                {(call.error || callError || speech.error) && (
+                  <span className="field-error">{call.error || callError || speech.error}</span>
+                )}
               </div>
             </div>
           </div>

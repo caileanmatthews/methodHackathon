@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ClipboardList, FileText } from 'lucide-react'
 import { api } from './api'
-import { formatDateTime } from './format'
+import { formatJobTime } from './format'
 import { Panel, Skeleton } from './ui'
 
 function Field({ label, value }) {
@@ -42,7 +42,7 @@ export function ReportDocument({ report }) {
           </div>
           <div>
             <dt>Job time</dt>
-            <dd>{report.job_time}</dd>
+            <dd>{formatJobTime(report.job_time)}</dd>
           </div>
         </dl>
       </header>
@@ -79,7 +79,7 @@ export function ReportList({ reports, selectedId, onSelect, empty }) {
             <span className="report-row-main">
               <strong>{r.title}</strong>
               <span className="muted small">
-                {r.asset_id} · {r.technician} · {formatDateTime(r.created)}
+                {r.asset_id} · {r.technician} · <span className="nowrap">{formatJobTime(r.job_time)}</span>
               </span>
               {r.recommendation && <span className="small clamp-2 report-row-outcome">{r.recommendation}</span>}
             </span>

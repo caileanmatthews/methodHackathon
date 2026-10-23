@@ -16,8 +16,8 @@ export const api = {
   reports: () => request('/reports'),
   conditions: (id, scenario) => request(`/conditions/${id}?scenario=${scenario}`),
   startSession: (body) => request('/session', { method: 'POST', body: JSON.stringify(body) }),
-  chat: (session_id, message) =>
-    request('/chat', { method: 'POST', body: JSON.stringify({ session_id, message }) }),
+  chat: (session_id, message, call = false) =>
+    request('/chat', { method: 'POST', body: JSON.stringify({ session_id, message, call }) }),
   finishJob: (id) => request(`/session/${id}/report`, { method: 'POST' }),
 }
 
