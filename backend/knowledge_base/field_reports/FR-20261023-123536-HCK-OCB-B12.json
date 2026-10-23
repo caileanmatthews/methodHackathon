@@ -1,0 +1,46 @@
+{
+  "report_id": "FR-20261023-123536-HCK-OCB-B12",
+  "created": "2026-10-23T12:35:36",
+  "technician": "Jordan Reyes",
+  "substation_id": "SUB-HCK",
+  "job_time": "2027-01-19 02:30 (Tuesday)",
+  "asset_id": "HCK-OCB-B12",
+  "title": "B-12 failed to open on first SCADA trip during pre-storm switching; cold-weather latch/heater suspected. Tech reported no findings.",
+  "symptom": "2027-01-19 01:52 pre-storm switching test: B-12 did not open on first SCADA trip command, opened on second command 28 s later, closed back in at 02:06. Tech dispatched to decide if B-12 can stay in service through the ice storm.",
+  "site_conditions": "11 F overnight, wind 10-15 mph. Winter Storm Warning from 18:00 1/19 to 12:00 1/20: freezing rain, 0.25-0.5 in ice, gusts to 40 mph on ridgetops, low near 6 F tonight. Exposed ridge site.",
+  "as_found": "No measurements or observations were reported by the technician in this conversation. Heater status, trip coil condition, latch engagement, timing, and minimum trip voltage were NOT recorded. Known before arrival: WO-25-11806 still open (continuous cabinet heater element open circuit, replacement backordered; only thermostat heater working). Last latch lubrication 2016-02-10, past the 5-year interval.",
+  "root_cause": "Not confirmed. Most likely the trip latch/roller stiffening in cold (aged grease, possible latch engagement screw backed off) made worse by reduced cabinet heat from the failed continuous heater. Evidence: same pattern in WO-09-00342, WO-14-00287, WO-16-00611/00630, WO-26-02233, and Ray Thompson exit interview.",
+  "actions_taken": [
+    "Assistant pulled site conditions and briefed tech: check cabinet heat first, then trip coil for overheating; do not send repeated trips; dump both springs before any latch work; ignore BOC-69-2000 manual (wrong model).",
+    "No field actions, measurements, or repairs were reported by the technician."
+  ],
+  "as_left": "Not reported by technician. Per SCADA log, B-12 was CLOSED and in service as of 02:06. Unknown whether any work was done or whether it was removed from service.",
+  "recommendation": "Assistant's advice: B-12 should not be relied on through tonight's ice storm in its current condition. Ask system ops to open B-12 and carry Line 69-4 from Bel Air, then do the latch job (isolate, ground, control power off, dump both springs, solvent-clean, Mobilgrease 28 per EM-2014-007, set latch engagement to mid-spec 0.060-0.090 in, tighten locknut, time at 3.0 cycles max or less, minimum trip at 70 VDC). If an outage isn't possible, at minimum restore cabinet heat. The tech did not confirm what was actually told to dispatch.",
+  "follow_up": [
+    "CONFIRM with Jordan Reyes what was found and done. This report has no as-found or as-left data.",
+    "WO-25-11806: expedite replacement continuous heater element (backordered).",
+    "Trip latch clean/relube and engagement check is overdue (last done 2016).",
+    "Check trip coil resistance (12.5 ohms plus or minus 10 percent at 77 F) after the two trip commands.",
+    "Remind ops: if B-12 doesn't open on the first trip, stop and call a tech. Don't re-send."
+  ],
+  "tips_for_next_tech": [
+    "B-12 gets slow or sticks on trip in cold weather. Check cabinet heat first, every time.",
+    "Latch engagement screw backs off over time (0.040 in found in 2016). Check it with a feeler gauge and lock the nut.",
+    "Use IB-BOC-69 (SM-3) limits only. The BOC-69-2000/SM-4 manual in the same binder is the wrong model.",
+    "Use Mobilgrease 28 per EM-2014-007, not ASC G-11. Remove all old grease first.",
+    "Repeated trip commands burn the trip coil (WO-16-00611)."
+  ],
+  "sources_used": [
+    "scada_event_log.csv 2027-01-19",
+    "WO-09-00342",
+    "WO-14-00287",
+    "WO-16-00611",
+    "WO-16-00630",
+    "WO-25-11806",
+    "WO-26-02233",
+    "manuals/allied_BOC-69_manual_excerpt.md",
+    "memos/EM-2014-007_approved_lubricant_SM3.md",
+    "transcripts/exit_interview_ray_thompson_2026-04.md",
+    "get_site_conditions SUB-HCK"
+  ]
+}
