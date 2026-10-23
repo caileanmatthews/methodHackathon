@@ -43,6 +43,9 @@ How to answer:
   factor tonight's weather (temperature, storm alerts, wind, icing) into how urgent the fix is and what could fail.
 - Earlier field reports are the most recent knowledge from techs; check them for this asset first.
 - As you go, keep track of what the tech reports: as-found readings, what they did, what worked.
+- Dispatch watches a status panel fed by update_dispatch_status. Call it after your first briefing (usually
+  "assessing") and again whenever your recommendation or what the tech needs changes. Keep it in step with
+  what you tell the tech.
 - When the tech says the job is done (or asks you to write it up), call save_field_report with a complete,
   accurate report built only from what was said and found in this conversation, plus the lessons the next tech
   needs. Then confirm in one or two sentences what was recorded.
@@ -58,6 +61,29 @@ TOOLS = [
             "type": "object",
             "properties": {"substation_id": {"type": "string", "description": "e.g. SUB-HCK or SUB-QRY"}},
             "required": ["substation_id"],
+            "additionalProperties": False,
+        },
+    },
+    {
+        "name": "update_dispatch_status",
+        "description": "Update the service recommendation shown to dispatch for the asset on this job.",
+        "strict": True,
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "enum": ["assessing", "ok_in_service", "conditional", "remove_from_service"],
+                    "description": "assessing: still diagnosing; ok_in_service: can stay in through the conditions; "
+                                   "conditional: can stay in only if the listed conditions are met; "
+                                   "remove_from_service: take it out / do not rely on it.",
+                },
+                "headline": {"type": "string", "description": "One sentence a dispatcher can act on"},
+                "rationale": {"type": "string", "description": "Short why, citing evidence and conditions"},
+                "needs": {"type": "array", "items": {"type": "string"},
+                          "description": "Crew, parts, switching, or approvals the tech needs (empty if none)"},
+            },
+            "required": ["status", "headline", "rationale", "needs"],
             "additionalProperties": False,
         },
     },
@@ -134,6 +160,9 @@ def run_tool(session: dict, name: str, args: dict) -> tuple[str, bool]:
         cond = site_conditions(site, session["scenario_mode"])
         session["conditions"] = cond
         return json.dumps(cond), False
+    if name == "update_dispatch_status":
+        session["dispatch"] = {**args, "updated": datetime.now().isoformat(timespec="seconds")}
+        return json.dumps({"updated": True}), False
     if name == "save_field_report":
         report = save_report(session, args)
         session["report"] = report
@@ -249,7 +278,8 @@ def start_session(body: SessionStart):
         "what I should check first, and anything I must not do."
     )
     reply = converse(session, opener)
-    return {"session_id": session_id, "reply": reply, "conditions": session.get("conditions")}
+    return {"session_id": session_id, "reply": reply, "conditions": session.get("conditions"),
+            "dispatch": session.get("dispatch")}
 
 
 @app.post("/api/chat")
@@ -260,7 +290,8 @@ def chat(body: ChatIn):
     before = session["report"]
     reply = converse(session, body.message)
     report = session["report"] if session["report"] is not before else None
-    return {"reply": reply, "report": report, "conditions": session.get("conditions")}
+    return {"reply": reply, "report": report, "conditions": session.get("conditions"),
+            "dispatch": session.get("dispatch")}
 
 
 @app.post("/api/session/{session_id}/report")
@@ -269,4 +300,4 @@ def finish_job(session_id: str):
     if not session:
         raise HTTPException(404, "Session expired. Start a new job.")
     reply = converse(session, "The job is complete. Write and save the field report now using save_field_report.")
-    return {"reply": reply, "report": session["report"]}
+    return {"reply": reply, "report": session["report"], "dispatch": session.get("dispatch")}
