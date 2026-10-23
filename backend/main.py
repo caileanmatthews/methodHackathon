@@ -2,23 +2,38 @@
 and field reports that feed back into the knowledge base."""
 import json
 import uuid
+from collections.abc import Iterator
 from datetime import datetime
 
 import anthropic
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 import knowledge
-from conditions import site_conditions
+from conditions import prefetch_conditions, site_conditions
 from transcribe import transcribe
 
 load_dotenv()
 
-MODEL = "claude-opus-5-5"
+# Briefings, typed questions and field reports get the most capable model. Live voice calls use a fast,
+# lightweight model so replies start sooner; low effort suits short conversational turns.
+MAIN_MODEL = {
+    "model": "claude-opus-5-5",
+    "output_config": {"effort": "medium"},
+    "betas": ["server-side-fallback-2026-07-01"],
+    "fallbacks": "default",
+}
+# Claude Haiku 5.5 has no server-side fallback, so no fallbacks here; a refusal is retried on MAIN_MODEL.
+CALL_MODEL = {
+    "model": "claude-haiku-5-5",
+    "output_config": {"effort": "low"},
+}
 SCENARIO_TIME = "2027-01-19 02:30 (Tuesday)"
 MAX_TOOL_ROUNDS = 8
+NEARBY_WAIT_S = 2.0  # how long a briefing waits on OpenStreetMap before going ahead without it
 
 client = anthropic.Anthropic()
 app = FastAPI(title="Watt's Up Field Assistant")
@@ -162,7 +177,7 @@ def save_report(session: dict, data: dict) -> dict:
 def run_tool(session: dict, name: str, args: dict) -> tuple[str, bool]:
     if name == "get_site_conditions":
         site = find_site(args["substation_id"])
-        cond = site_conditions(site, session["scenario_mode"])
+        cond = site_conditions(site, session["scenario_mode"], nearby_wait=NEARBY_WAIT_S)
         session["conditions"] = cond
         return json.dumps(cond), False
     if name == "update_dispatch_status":
@@ -175,44 +190,120 @@ def run_tool(session: dict, name: str, args: dict) -> tuple[str, bool]:
     return f"Unknown tool {name}", True
 
 
-def converse(session: dict, text: str) -> str:
-    session["messages"].append({"role": "user", "content": text})
-    for _ in range(MAX_TOOL_ROUNDS):
-        try:
-            response = client.beta.messages.create(
-                model=MODEL,
-                max_tokens=16000,
-                system=session["system"],
-                tools=TOOLS,
-                messages=session["messages"],
-                output_config={"effort": "medium"},
-                betas=["server-side-fallback-2026-07-01"],
-                fallbacks="default",
-            )
-        except anthropic.RateLimitError:
-            raise HTTPException(429, "The assistant is rate limited. Try again in a moment.")
-        except anthropic.APIStatusError as e:
-            raise HTTPException(502, f"Assistant error: {e.message}")
-        except anthropic.APIConnectionError:
-            raise HTTPException(503, "Can't reach the assistant service. Check signal and try again.")
+TOOL_STATUS = {
+    "get_site_conditions": "Checking site conditions",
+    "update_dispatch_status": "Updating dispatch",
+    "save_field_report": "Saving the field report",
+}
+# Dashboard state a tool changes, pushed to the client as soon as the tool runs.
+TOOL_UPDATES = {"get_site_conditions": "conditions", "update_dispatch_status": "dispatch", "save_field_report": "report"}
+INTERRUPTED = "Interrupted by the technician before this ran."
+FINISH_TEXT = "The job is complete. Write and save the field report now using save_field_report."
 
-        if response.stop_reason == "refusal":
-            session["messages"].pop()
-            return "I can't help with that request."
 
-        # Append the full content (including thinking blocks) so the history stays append-only.
-        session["messages"].append({"role": "assistant", "content": response.content})
-        if response.stop_reason != "tool_use":
-            return "\n".join(b.text for b in response.content if b.type == "text").strip()
+def add_user_text(session: dict, text: str) -> None:
+    # An interrupted turn can leave the history ending on a user message; fold the new text into it.
+    msgs = session["messages"]
+    if msgs and msgs[-1]["role"] == "user":
+        content = msgs[-1]["content"]
+        blocks = [{"type": "text", "text": content}] if isinstance(content, str) else list(content)
+        msgs[-1] = {"role": "user", "content": blocks + [{"type": "text", "text": text}]}
+    else:
+        msgs.append({"role": "user", "content": text})
 
-        results = []
-        for block in response.content:
-            if block.type == "tool_use":
-                output, is_error = run_tool(session, block.name, block.input)
-                results.append({"type": "tool_result", "tool_use_id": block.id, "content": output,
-                                "is_error": is_error})
-        session["messages"].append({"role": "user", "content": results})
-    return "I ran out of steps working on that. Please ask again."
+
+def close_dangling_tool_uses(session: dict) -> None:
+    # If the client disconnected after a tool_use was recorded but before its results, answer it so the
+    # history stays valid for the next request.
+    msgs = session["messages"]
+    if not msgs or msgs[-1]["role"] != "assistant":
+        return
+    pending = [b for b in msgs[-1]["content"] if getattr(b, "type", None) == "tool_use"]
+    if pending:
+        msgs.append({"role": "user", "content": [
+            {"type": "tool_result", "tool_use_id": b.id, "content": INTERRUPTED, "is_error": True} for b in pending
+        ]})
+
+
+def converse_stream(session: dict, text: str, fast: bool = False) -> Iterator[dict]:
+    """Run one technician turn, yielding events as they happen:
+    {"type": "text", "text"} deltas, {"type": "status", "text"} while tools run,
+    {"type": "conditions"|"dispatch"|"report", "data"} dashboard updates, and a final {"type": "done", "reply"}.
+    fast=True runs the turn on the lightweight call model."""
+    history_len = len(session["messages"])
+    add_user_text(session, text)
+    spoken: list[str] = []
+    model = CALL_MODEL if fast else MAIN_MODEL
+    try:
+        for _ in range(MAX_TOOL_ROUNDS):
+            round_text: list[str] = []
+            try:
+                # Tool inputs here are small and strict-validated, so eager input streaming is left off:
+                # buffering them costs nothing the technician can see or hear.
+                with client.beta.messages.stream(
+                    max_tokens=16000,
+                    system=session["system"],
+                    tools=TOOLS,
+                    messages=session["messages"],
+                    **model,
+                ) as stream:
+                    for event in stream:
+                        if event.type == "text":
+                            if not round_text and spoken:
+                                yield {"type": "text", "text": "\n\n"}
+                            round_text.append(event.text)
+                            yield {"type": "text", "text": event.text}
+                    response = stream.get_final_message()
+            except anthropic.RateLimitError:
+                raise HTTPException(429, "The assistant is rate limited. Try again in a moment.")
+            except anthropic.APIStatusError as e:
+                raise HTTPException(502, f"Assistant error: {e.message}")
+            except anthropic.APIConnectionError:
+                raise HTTPException(503, "Can't reach the assistant service. Check signal and try again.")
+
+            if response.stop_reason == "refusal" and model is CALL_MODEL:
+                # The call model has no server-side fallback: redo this round on the main model instead.
+                model = MAIN_MODEL
+                yield {"type": "replace", "text": "\n\n".join(t for t in spoken if t)}
+                continue
+            if response.stop_reason == "refusal":
+                del session["messages"][history_len:]
+                yield {"type": "replace", "text": "I can't help with that request."}
+                yield {"type": "done", "reply": "I can't help with that request."}
+                return
+
+            # Append the full content (including thinking blocks) so the history stays append-only.
+            session["messages"].append({"role": "assistant", "content": response.content})
+            if round_text:
+                spoken.append("".join(round_text).strip())
+            if response.stop_reason != "tool_use":
+                yield {"type": "done", "reply": "\n\n".join(t for t in spoken if t)}
+                return
+
+            results = []
+            for block in response.content:
+                if block.type == "tool_use":
+                    yield {"type": "status", "text": TOOL_STATUS.get(block.name, "Working")}
+                    output, is_error = run_tool(session, block.name, block.input)
+                    results.append({"type": "tool_result", "tool_use_id": block.id, "content": output,
+                                    "is_error": is_error})
+                    key = TOOL_UPDATES.get(block.name)
+                    if key and not is_error:
+                        yield {"type": key, "data": session.get(key)}
+            session["messages"].append({"role": "user", "content": results})
+        message = "I ran out of steps working on that. Please ask again."
+        yield {"type": "text", "text": message}
+        yield {"type": "done", "reply": message}
+    finally:
+        close_dangling_tool_uses(session)
+
+
+def converse(session: dict, text: str, fast: bool = False) -> str:
+    reply = ""
+    for event in converse_stream(session, text, fast):
+        if event["type"] == "done":
+            reply = event["reply"]
+    return reply
 
 
 class SessionStart(BaseModel):
@@ -221,6 +312,13 @@ class SessionStart(BaseModel):
     technician: str = "Jordan Reyes"
     dispatch_note: str = ""
     scenario_mode: bool = True
+
+
+class StreamIn(BaseModel):
+    session_id: str
+    kind: str = "message"  # "brief" (opening briefing), "message", or "finish" (write the field report)
+    message: str = ""
+    call: bool = False
 
 
 class ChatIn(BaseModel):
@@ -283,9 +381,9 @@ def start_session(body: SessionStart):
         "I'm on my way to / at the site. Check site conditions, then brief me: what's most likely wrong, "
         "what I should check first, and anything I must not do."
     )
-    reply = converse(session, opener)
-    return {"session_id": session_id, "reply": reply, "conditions": session.get("conditions"),
-            "dispatch": session.get("dispatch")}
+    session["opener"] = opener
+    prefetch_conditions(site, body.scenario_mode)
+    return {"session_id": session_id}
 
 
 @app.post("/api/chat")
@@ -295,7 +393,7 @@ def chat(body: ChatIn):
         raise HTTPException(404, "Session expired. Start a new job.")
     before = session["report"]
     text = f"(voice call) {body.message}" if body.call else body.message
-    reply = converse(session, text)
+    reply = converse(session, text, fast=body.call)
     report = session["report"] if session["report"] is not before else None
     return {"reply": reply, "report": report, "conditions": session.get("conditions"),
             "dispatch": session.get("dispatch")}
@@ -306,5 +404,30 @@ def finish_job(session_id: str):
     session = SESSIONS.get(session_id)
     if not session:
         raise HTTPException(404, "Session expired. Start a new job.")
-    reply = converse(session, "The job is complete. Write and save the field report now using save_field_report.")
+    reply = converse(session, FINISH_TEXT)
     return {"reply": reply, "report": session["report"], "dispatch": session.get("dispatch")}
+
+
+
+@app.post("/api/chat/stream")
+def chat_stream(body: StreamIn):
+    """Newline-delimited JSON events, so the client can show and speak the reply while it is written."""
+    session = SESSIONS.get(body.session_id)
+    if not session:
+        raise HTTPException(404, "Session expired. Start a new job.")
+    if body.kind == "brief":
+        text = session["opener"]
+    elif body.kind == "finish":
+        text = FINISH_TEXT
+    else:
+        text = f"(voice call) {body.message}" if body.call else body.message
+
+    def events():
+        try:
+            for event in converse_stream(session, text, fast=body.kind == "message" and body.call):
+                yield json.dumps(event) + "\n"
+        except HTTPException as e:
+            yield json.dumps({"type": "error", "message": e.detail}) + "\n"
+
+    return StreamingResponse(events(), media_type="application/x-ndjson",
+                             headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})

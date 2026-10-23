@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { ClipboardCheck, Mic, MicOff, Phone, PhoneOff, SendHorizontal, Square, Volume2, VolumeX } from 'lucide-react'
-import { api, transcribe } from './api'
+import { api, streamTurn, transcribe } from './api'
 import { useCall } from './useCall'
 import { useSpeech } from './useSpeech'
 import { AssetPanel, ConditionsPanel, DispatchPanel, DispatchStrip, SurroundingsPanel } from './panels'
@@ -28,7 +28,22 @@ function Message({ m, technician, onSpeak }) {
           </button>
         )}
       </div>
-      <div className="msg-body">{m.text}</div>
+      {m.text ? (
+        <div className="msg-body">
+          {m.text}
+          {m.interrupted && <span className="msg-note"> (interrupted)</span>}
+        </div>
+      ) : (
+        <div className="msg-body thinking">
+          <span className="dots" aria-hidden>
+            <i />
+            <i />
+            <i />
+          </span>
+          {m.status || 'Reviewing the library and site conditions'}
+        </div>
+      )}
+      {m.text && m.status && <div className="msg-status">{m.status}…</div>}
     </div>
   )
 }
@@ -38,31 +53,65 @@ export default function JobView({ job, assets, onDispatch }) {
   const [startedAt] = useState(() => Date.now())
   const clockMs = () => (job.scenario_mode ? SCENARIO_NOW + (Date.now() - startedAt) : Date.now())
   const now = () => formatClock(clockMs())
-  const [messages, setMessages] = useState(() => [{ role: 'assistant', text: job.reply, time: now() }])
-  const [conditions, setConditions] = useState(job.conditions)
-  const [dispatch, setDispatch] = useState(() => job.dispatch && { ...job.dispatch, shownAt: clockMs() })
+  const [messages, setMessages] = useState([])
+  const [conditions, setConditions] = useState(null)
+  const [dispatch, setDispatch] = useState(null)
   const [report, setReport] = useState(null)
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
   const [voiceOut, setVoiceOut] = useState(true)
   const [callTranscribing, setCallTranscribing] = useState(false)
   const [callError, setCallError] = useState('')
+  const [callCaption, setCallCaption] = useState('')
   const [callStartedAt, setCallStartedAt] = useState(null)
   const [, setTick] = useState(0)
   const [tab, setTab] = useState('chat')
   const bottomRef = useRef(null)
   const lastReplyRef = useRef(null)
   const sendRef = useRef(null)
+  // Refs for values read inside an in-flight stream, which outlives the render that started it.
+  const busyRef = useRef(false)
+  const abortRef = useRef(null)
+  const queuedRef = useRef(null)
+  const msgSeq = useRef(0)
+  const briefedRef = useRef(false)
+  const liveRef = useRef({ callActive: false, voiceOut: true })
+  // Streaming transcription state for the current call turn.
+  const sttRef = useRef({ turn: 0, interimBusy: false, pause: null })
 
   const speech = useSpeech({ onFinalTranscript: (t) => sendRef.current(t) })
   const call = useCall({
     assistantSpeakingRef: speech.speakingRef,
     // The tech started talking over the assistant: stop speaking and listen.
     onBargeIn: () => speech.stopSpeaking(),
-    onUtterance: async (wav) => {
+    // Live caption while the tech talks; skipped if the previous partial is still being transcribed.
+    onInterim: (wav) => {
+      const stt = sttRef.current
+      if (stt.interimBusy) return
+      stt.interimBusy = true
+      const turn = stt.turn
+      transcribe(wav)
+        .then((t) => turn === sttRef.current.turn && setCallCaption(t))
+        .catch(() => {})
+        .finally(() => {
+          stt.interimBusy = false
+        })
+    },
+    // Start transcribing at the first pause; if the turn ends without more speech, this is the final text.
+    onPause: (wav, seq) => {
+      const stt = sttRef.current
+      const turn = stt.turn
+      stt.pause = { seq, promise: transcribe(wav) }
+      stt.pause.promise.then((t) => turn === sttRef.current.turn && setCallCaption(t)).catch(() => {})
+    },
+    onUtterance: async (wav, seq) => {
+      const stt = sttRef.current
+      const early = stt.pause?.seq === seq ? stt.pause.promise : null
+      stt.pause = null
+      stt.turn++
       setCallTranscribing(true)
       try {
-        const text = (await transcribe(wav)).trim()
+        const text = (early ? await early.catch(() => transcribe(wav)) : await transcribe(wav)).trim()
         if (text) sendRef.current(text, true)
         else call.resume()
       } catch (e) {
@@ -70,8 +119,13 @@ export default function JobView({ job, assets, onDispatch }) {
         call.resume()
       } finally {
         setCallTranscribing(false)
+        setCallCaption('')
       }
     },
+  })
+
+  useEffect(() => {
+    liveRef.current = { callActive: call.active, voiceOut }
   })
 
   // Re-render once a second so the call timer moves.
@@ -83,15 +137,12 @@ export default function JobView({ job, assets, onDispatch }) {
   const asset = assets.find((a) => a.asset_id === job.asset_id)
   const nowMs = clockMs()
 
+  // The dashboard fills in from the (server-cached) conditions while the briefing streams.
+  // The briefing may go ahead before the map data lands ("still loading"); fetch the full set when that happens.
+  const mapPending = !conditions || conditions.nearby?.source?.startsWith('still loading')
   useEffect(() => {
-    if (!conditions) api.conditions(job.substation_id, job.scenario_mode).then(setConditions).catch(() => {})
-  }, [conditions, job])
-
-  useEffect(() => {
-    if (voiceOut) speech.speak(job.reply)
-    // Speak the opening briefing once.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    if (mapPending) api.conditions(job.substation_id, job.scenario_mode).then(setConditions).catch(() => {})
+  }, [mapPending, job])
 
   useEffect(() => {
     onDispatch?.(dispatch?.status)
@@ -99,54 +150,106 @@ export default function JobView({ job, assets, onDispatch }) {
 
   // A new reply scrolls to its first line so the answer is read from the top; anything else follows the end.
   useEffect(() => {
-    if (messages[messages.length - 1]?.role === 'assistant' && !busy) {
+    if (messages[messages.length - 1]?.role === 'assistant' && !speech.interim && !callCaption) {
       lastReplyRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     } else {
       bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
     }
-  }, [messages, busy, speech.interim])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages.length, speech.interim, callCaption])
 
-  function apply(res) {
-    if (res.conditions) setConditions(res.conditions)
-    if (res.dispatch) setDispatch({ ...res.dispatch, shownAt: clockMs() })
-    setMessages((m) => [...m, { role: 'assistant', text: res.reply, time: now() }])
-    if (res.report) {
-      setReport(res.report)
-      setTab('report')
-    }
-    if (call.active) {
-      // On a call every reply is spoken, and the mic listens straight away so the tech can cut in.
-      speech.speak(res.reply)
-      call.resume()
-    } else if (voiceOut) {
-      speech.speak(res.reply)
-    }
-  }
-
-  async function run(userText, request) {
-    if (busy) {
-      if (call.active) call.resume()
+  // Run one assistant turn, showing and speaking the reply as it streams in.
+  async function turn(kind, { userText, message = '', viaCall = false } = {}) {
+    if (busyRef.current) {
+      // Cutting in on a call: stop the reply in progress and send this as the next turn.
+      if (viaCall) {
+        queuedRef.current = message
+        abortRef.current?.abort()
+      }
       return
     }
-    setMessages((m) => [...m, { role: 'user', text: userText, time: now() }])
+    busyRef.current = true
     setBusy(true)
     setTab((t) => (t === 'report' ? t : 'chat'))
+    const id = ++msgSeq.current
+    setMessages((m) => [
+      ...m,
+      ...(userText ? [{ role: 'user', text: userText, time: now() }] : []),
+      { role: 'assistant', id, text: '', time: now() },
+    ])
+    const update = (patch) => setMessages((m) => m.map((x) => (x.id === id ? { ...x, ...patch } : x)))
+    const onCall = liveRef.current.callActive
+    const speaker = onCall || liveRef.current.voiceOut ? speech.speakStream() : null
+    const controller = new AbortController()
+    abortRef.current = controller
+    let text = ''
+
     try {
-      apply(await request())
-    } catch (e) {
-      setMessages((m) => [...m, { role: 'error', text: e.message }])
-      if (call.active) call.resume()
+      await streamTurn(
+        { session_id: job.session_id, kind, message, call: onCall || viaCall, signal: controller.signal },
+        (e) => {
+          if (e.type === 'text') {
+            // On a call, start listening with the first words so the tech can cut in.
+            if (!text && onCall) call.resume()
+            text += e.text
+            update({ text, status: null })
+            speaker?.push(e.text)
+          } else if (e.type === 'replace') {
+            text = e.text
+            update({ text })
+          } else if (e.type === 'status') {
+            update({ status: e.text })
+          } else if (e.type === 'conditions') {
+            setConditions(e.data)
+          } else if (e.type === 'dispatch') {
+            setDispatch({ ...e.data, shownAt: clockMs() })
+          } else if (e.type === 'report') {
+            setReport(e.data)
+            setTab('report')
+          }
+        },
+      )
+      update({ text: text.trim(), status: null })
+      speaker?.end()
+    } catch (err) {
+      speaker?.end()
+      if (err.name === 'AbortError') {
+        speech.stopSpeaking()
+        if (text) update({ status: null, interrupted: true })
+        else setMessages((m) => m.filter((x) => x.id !== id))
+      } else {
+        setMessages((m) => [...m.filter((x) => x.id !== id || x.text), { role: 'error', text: err.message }])
+      }
     } finally {
+      busyRef.current = false
+      abortRef.current = null
       setBusy(false)
+      if (liveRef.current.callActive) call.resume()
+      const queued = queuedRef.current
+      queuedRef.current = null
+      if (queued) turn('message', { userText: queued, message: queued, viaCall: true })
     }
   }
+
+  // Stream the opening briefing as soon as the job opens (once, even under StrictMode's double effects).
+  useEffect(() => {
+    if (briefedRef.current) return
+    briefedRef.current = true
+    turn('brief')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   function send(text, viaCall = false) {
     const msg = text.trim()
     if (!msg) return
     if (!viaCall) setInput('')
-    run(msg, () => api.chat(job.session_id, msg, viaCall || call.active))
+    turn('message', { userText: msg, message: msg, viaCall })
   }
+  useEffect(() => {
+    sendRef.current = send
+  })
+
+  const finish = () => turn('finish', { userText: 'Job complete. Write up the field report.' })
 
   async function startCall() {
     setCallError('')
@@ -177,11 +280,6 @@ export default function JobView({ job, assets, onDispatch }) {
               : speech.speaking
                 ? 'Speaking. Talk any time to cut in.'
                 : 'Listening. Go ahead.'
-  useEffect(() => {
-    sendRef.current = send
-  })
-
-  const finish = () => run('Job complete. Write up the field report.', () => api.finishJob(job.session_id))
 
   const micLabel = speech.listening
     ? 'Listening… tap to stop'
@@ -243,22 +341,9 @@ export default function JobView({ job, assets, onDispatch }) {
                   <Message m={m} technician={job.technician} onSpeak={(t) => speech.speak(t)} />
                 </div>
               ))}
-              {busy && (
-                <div className="msg is-assistant">
-                  <div className="msg-meta">
-                    <span>Field assistant</span>
-                  </div>
-                  <div className="msg-body thinking">
-                    <span className="dots" aria-hidden>
-                      <i />
-                      <i />
-                      <i />
-                    </span>
-                    Reviewing the library and site conditions
-                  </div>
-                </div>
+              {(speech.interim || callCaption) && (
+                <div className="msg is-user is-interim">{speech.interim || callCaption}</div>
               )}
-              {speech.interim && <div className="msg is-user is-interim">{speech.interim}</div>}
               <div ref={bottomRef} />
             </div>
 

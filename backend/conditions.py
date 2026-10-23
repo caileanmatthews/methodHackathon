@@ -1,5 +1,9 @@
 """Live site conditions: NWS weather/alerts and OpenStreetMap features, with cached fallbacks."""
 import json
+import threading
+import time
+from concurrent.futures import Future, ThreadPoolExecutor, as_completed
+from concurrent.futures import TimeoutError as FutureTimeout
 from pathlib import Path
 
 import httpx
@@ -12,6 +16,15 @@ CACHE_DIR.mkdir(parents=True, exist_ok=True)
 NWS_HEADERS = {"User-Agent": "(wattsup-field-assistant, hackathon-demo)", "Accept": "application/geo+json"}
 OVERPASS_URLS = ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter"]
 TIMEOUT = 12.0
+OVERPASS_TIMEOUT = 6.0
+CONDITIONS_TTL_S = 600
+
+_pool = ThreadPoolExecutor(max_workers=8, thread_name_prefix="conditions")
+# Mirror requests are awaited by _pool jobs, so they get their own pool and can never starve it.
+_mirror_pool = ThreadPoolExecutor(max_workers=4, thread_name_prefix="overpass")
+_lock = threading.Lock()
+# (substation_id, scenario_mode) -> (fetched_at, weather future, nearby future)
+_memo: dict[tuple[str, bool], tuple[float, Future, Future]] = {}
 
 
 def _cache_write(key: str, data: dict) -> None:
@@ -67,14 +80,20 @@ def get_weather(site: dict, scenario_mode: bool) -> dict:
         return {"alerts": [], "forecast": [], "source": f"unavailable ({type(e).__name__})"}
 
 
+def _overpass_one(url: str, query: str) -> httpx.Response:
+    r = httpx.post(url, data={"data": query}, timeout=OVERPASS_TIMEOUT, headers={"User-Agent": NWS_HEADERS["User-Agent"]})
+    r.raise_for_status()
+    r.json()
+    return r
+
+
 def _overpass(query: str) -> httpx.Response:
+    # Ask every mirror at once and take the first good answer; a down mirror then costs nothing extra.
+    futures = [_mirror_pool.submit(_overpass_one, url, query) for url in OVERPASS_URLS]
     error: Exception = httpx.HTTPError("no Overpass endpoint")
-    for url in OVERPASS_URLS:
+    for f in as_completed(futures):
         try:
-            r = httpx.post(url, data={"data": query}, timeout=10.0, headers={"User-Agent": NWS_HEADERS["User-Agent"]})
-            r.raise_for_status()
-            r.json()
-            return r
+            return f.result()
         except (httpx.HTTPError, ValueError) as e:
             error = e
     raise error
@@ -114,9 +133,39 @@ def get_nearby_features(site: dict, radius_m: int = 1500) -> dict:
         return {"source": f"unavailable ({type(e).__name__})"}
 
 
-def site_conditions(site: dict, scenario_mode: bool) -> dict:
+def _failed(weather: Future) -> bool:
+    # A finished fetch with no weather at all is retried rather than served from memory.
+    return weather.done() and weather.result()["source"].startswith("unavailable")
+
+
+def _futures(site: dict, scenario_mode: bool) -> tuple[Future, Future]:
+    # One fetch per site per TTL window; callers that arrive while it is in flight share it.
+    key = (site["substation_id"], scenario_mode)
+    with _lock:
+        entry = _memo.get(key)
+        if entry and time.monotonic() - entry[0] < CONDITIONS_TTL_S and not _failed(entry[1]):
+            return entry[1], entry[2]
+        weather = _pool.submit(get_weather, site, scenario_mode)
+        nearby = _pool.submit(get_nearby_features, site)
+        _memo[key] = (time.monotonic(), weather, nearby)
+        return weather, nearby
+
+
+def prefetch_conditions(site: dict, scenario_mode: bool) -> None:
+    """Start fetching in the background so the briefing doesn't wait on the weather and map APIs."""
+    _futures(site, scenario_mode)
+
+
+def site_conditions(site: dict, scenario_mode: bool, nearby_wait: float | None = None) -> dict:
+    """Weather is always waited for. Map data waits at most nearby_wait seconds (None: until done), so a slow
+    Overpass doesn't hold up an answer that mostly depends on the weather."""
+    weather, nearby = _futures(site, scenario_mode)
+    try:
+        nearby_data = nearby.result(timeout=nearby_wait)
+    except FutureTimeout:
+        nearby_data = {"source": "still loading from OpenStreetMap"}
     return {
         "substation": {k: site[k] for k in ("substation_id", "name", "latitude", "longitude", "access_notes", "surroundings")},
-        "weather": get_weather(site, scenario_mode),
-        "nearby": get_nearby_features(site),
+        "weather": weather.result(),
+        "nearby": nearby_data,
     }

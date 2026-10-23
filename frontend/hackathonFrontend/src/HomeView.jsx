@@ -107,7 +107,7 @@ export default function HomeView({ sites, assets, loadError, onStart, onOpenRepo
               <div className="form-actions">
                 <button className="btn btn-primary btn-lg" disabled={starting}>
                   {starting ? (
-                    'Checking conditions and briefing…'
+                    'Opening job…'
                   ) : (
                     <>
                       Start job <ArrowRight size={18} aria-hidden />

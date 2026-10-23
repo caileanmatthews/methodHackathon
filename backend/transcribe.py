@@ -23,7 +23,8 @@ VOCAB_PROMPT = (
 @lru_cache(maxsize=1)
 def model() -> WhisperModel:
     # The first call downloads the model (about 150 MB for base.en) and caches it locally.
-    return WhisperModel(WHISPER_MODEL, device="cpu", compute_type="int8")
+    # Two workers so a live-caption request never queues the final transcript behind it.
+    return WhisperModel(WHISPER_MODEL, device="cpu", compute_type="int8", num_workers=2)
 
 
 def decode(audio: bytes) -> np.ndarray:

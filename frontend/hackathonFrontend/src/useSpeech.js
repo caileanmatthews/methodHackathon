@@ -34,6 +34,9 @@ function pickVoice(voices) {
   return en.sort((a, b) => score(b) - score(a))[0] || null
 }
 
+// Shortest opening clause worth speaking on its own; shorter fragments sound clipped.
+const FIRST_CLAUSE_MIN = 30
+
 function pickMimeType() {
   for (const t of ['audio/webm;codecs=opus', 'audio/ogg;codecs=opus', 'audio/webm', 'audio/mp4']) {
     if (MediaRecorder.isTypeSupported?.(t)) return t
@@ -245,6 +248,80 @@ export function useSpeech({ onFinalTranscript }) {
     [setSpeakingBoth],
   )
 
+  // Speak a reply while it is still streaming: push() text as it arrives and each finished sentence is queued
+  // straight away; end() flushes the remainder and calls onDone once the last sentence has been spoken.
+  const speakStream = useCallback(() => {
+    const synth = window.speechSynthesis
+    synth?.cancel()
+    const gen = ++speakGen.current
+    let buffer = ''
+    let pending = 0
+    let ended = false
+    let started = false
+    let onDone
+
+    const live = () => gen === speakGen.current
+    const settle = () => {
+      if (ended && pending === 0 && live()) {
+        setSpeakingBoth(false)
+        onDone?.()
+      }
+    }
+    const say = (sentence) => {
+      const text = speakable(sentence)
+      if (!text || !synth || !live()) return
+      started = true
+      pending++
+      setSpeakingBoth(true)
+      const u = new SpeechSynthesisUtterance(text)
+      if (voiceRef.current) u.voice = voiceRef.current
+      u.rate = 1.03
+      u.onend = u.onerror = () => {
+        pending--
+        settle()
+      }
+      synth.speak(u)
+    }
+    const flush = (final) => {
+      // A sentence ends at . ! or ? followed by whitespace (so "3.1 cycles" stays whole), or at a line break.
+      // Not after a bare number, so a list marker like "1." isn't read out on its own.
+      let cut = final ? buffer.length : -1
+      if (!final) {
+        const boundary = /(?<=[^\d\s])[.!?]["')\]]*\s+|\n+/g
+        for (let m = boundary.exec(buffer); m; m = boundary.exec(buffer)) cut = m.index + m[0].length
+      }
+      // Before anything has been said, start on the first clause rather than waiting for a full sentence.
+      if (cut <= 0 && !final && !started && buffer.length >= FIRST_CLAUSE_MIN) {
+        const clause = /[,;:–—]\s+/g
+        for (let m = clause.exec(buffer); m; m = clause.exec(buffer)) cut = m.index + m[0].length
+        if (cut > 0) {
+          const first = buffer.slice(0, cut)
+          buffer = buffer.slice(cut)
+          say(first)
+          return
+        }
+      }
+      if (cut <= 0) return
+      const chunk = buffer.slice(0, cut)
+      buffer = buffer.slice(cut)
+      chunk.split(/(?<=[^\d\s][.!?]["')\]]*)\s+|\n+/).forEach(say)
+    }
+
+    return {
+      push(text) {
+        if (!live()) return
+        buffer += text
+        flush(false)
+      },
+      end(callback) {
+        onDone = callback
+        ended = true
+        if (live()) flush(true)
+        settle()
+      },
+    }
+  }, [setSpeakingBoth])
+
   const stopSpeaking = useCallback(() => {
     speakGen.current++
     window.speechSynthesis?.cancel()
@@ -262,6 +339,7 @@ export function useSpeech({ onFinalTranscript }) {
     listen,
     stopListening,
     speak,
+    speakStream,
     stopSpeaking,
   }
 }

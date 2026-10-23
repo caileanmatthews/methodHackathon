@@ -20,13 +20,20 @@ class Tap extends AudioWorkletProcessor {
 registerProcessor('call-tap', Tap)
 `
 
-const PREROLL_MS = 400 // audio kept from before speech is detected, so the first word isn't clipped
+// Audio kept from before speech is detected, so the first word isn't clipped. Generous because cutting in over
+// the assistant needs a longer run of voice before it counts.
+const PREROLL_MS = 1500
 const START_MS = 150 // sustained voice needed to start an utterance
 const BARGE_IN_START_MS = 350 // longer while the assistant is talking, so its own voice doesn't trigger it
-const END_SILENCE_MS = 900 // pause that ends a turn
+const END_SILENCE_MS = 1200 // pause that ends a turn; shorter splits sentences mid-thought
 const MIN_SPEECH_MS = 300 // shorter blips (coughs, clicks) are dropped
 const MAX_UTTERANCE_MS = 30000
 const TARGET_RATE = 16000
+// Streaming transcription: a partial transcript every INTERIM_MS while the tech talks (live caption), and one at
+// the first PAUSE_MS of quiet. If no more speech follows, that pause transcript is the final one and is usually
+// back before the turn ends, so the reply doesn't wait on Whisper.
+const INTERIM_MS = 1500
+const PAUSE_MS = 300
 
 function rmsOf(frame) {
   let sum = 0
@@ -74,16 +81,16 @@ function encodeWav(frames, inputRate) {
   return new Blob([buf], { type: 'audio/wav' })
 }
 
-export function useCall({ onUtterance, onBargeIn, assistantSpeakingRef }) {
+export function useCall({ onUtterance, onPause, onInterim, onBargeIn, assistantSpeakingRef }) {
   // phase: off | connecting | listening | capturing | waiting | muted
   const [phase, setPhase] = useState('off')
   const [level, setLevel] = useState(0)
   const [error, setError] = useState('')
   const audioRef = useRef(null)
   const phaseRef = useRef('off')
-  const handlers = useRef({ onUtterance, onBargeIn })
+  const handlers = useRef({ onUtterance, onPause, onInterim, onBargeIn })
   useEffect(() => {
-    handlers.current = { onUtterance, onBargeIn }
+    handlers.current = { onUtterance, onPause, onInterim, onBargeIn }
   })
 
   const go = useCallback((p) => {
@@ -128,7 +135,19 @@ export function useCall({ onUtterance, onBargeIn, assistantSpeakingRef }) {
     source.connect(node)
 
     const frameMs = (1024 / ctx.sampleRate) * 1000
-    const vad = { noise: 0.01, loudMs: 0, quietMs: 0, voicedMs: 0, totalMs: 0, preroll: [], captured: [], tick: 0 }
+    const vad = {
+      noise: 0.01,
+      loudMs: 0,
+      quietMs: 0,
+      voicedMs: 0,
+      totalMs: 0,
+      preroll: [],
+      captured: [],
+      tick: 0,
+      sinceInterimMs: 0,
+      paused: false,
+      seq: 0, // bumps whenever speech resumes after a pause, invalidating that pause's transcript
+    }
 
     node.port.onmessage = ({ data: frame }) => {
       const rms = rmsOf(frame)
@@ -141,8 +160,9 @@ export function useCall({ onUtterance, onBargeIn, assistantSpeakingRef }) {
         if (rms > threshold) {
           vad.loudMs += frameMs
         } else {
-          vad.loudMs = 0
-          if (!speaking) vad.noise = vad.noise * 0.95 + rms * 0.05
+          // Decay rather than reset, so the dips between syllables don't restart the count.
+          vad.loudMs = Math.max(0, vad.loudMs - frameMs * 0.5)
+          if (!speaking && vad.loudMs === 0) vad.noise = vad.noise * 0.95 + rms * 0.05
         }
         vad.preroll.push(frame)
         while (vad.preroll.length * frameMs > PREROLL_MS) vad.preroll.shift()
@@ -154,25 +174,41 @@ export function useCall({ onUtterance, onBargeIn, assistantSpeakingRef }) {
           vad.totalMs = vad.captured.length * frameMs
           vad.quietMs = 0
           vad.loudMs = 0
+          vad.sinceInterimMs = 0
+          vad.paused = false
+          vad.seq++
           go('capturing')
         }
       } else if (p === 'capturing') {
         vad.captured.push(frame)
         vad.totalMs += frameMs
+        vad.sinceInterimMs += frameMs
         if (rms > Math.max(0.012, vad.noise * 2.2)) {
           vad.quietMs = 0
           vad.voicedMs += frameMs
+          if (vad.paused) {
+            vad.paused = false
+            vad.seq++
+          }
         } else {
           vad.quietMs += frameMs
+        }
+        const enough = vad.voicedMs >= MIN_SPEECH_MS
+        if (enough && !vad.paused && vad.quietMs >= PAUSE_MS) {
+          vad.paused = true
+          handlers.current.onPause?.(encodeWav(vad.captured, ctx.sampleRate), vad.seq)
+        } else if (enough && !vad.paused && vad.sinceInterimMs >= INTERIM_MS) {
+          vad.sinceInterimMs = 0
+          handlers.current.onInterim?.(encodeWav(vad.captured, ctx.sampleRate))
         }
         if (vad.quietMs >= END_SILENCE_MS || vad.totalMs >= MAX_UTTERANCE_MS) {
           const frames = vad.captured
           vad.captured = []
-          if (vad.voicedMs < MIN_SPEECH_MS) {
+          if (!enough) {
             go('listening')
           } else {
             go('waiting')
-            handlers.current.onUtterance(encodeWav(frames, ctx.sampleRate))
+            handlers.current.onUtterance(encodeWav(frames, ctx.sampleRate), vad.seq)
           }
         }
       }
@@ -182,9 +218,10 @@ export function useCall({ onUtterance, onBargeIn, assistantSpeakingRef }) {
     go('listening')
   }, [assistantSpeakingRef, go])
 
-  // Back to listening after a turn is handled (or when unmuting).
+  // Back to listening once a turn has been handed off. Only from 'waiting', so an utterance being captured
+  // or a muted mic is never cut short.
   const resume = useCallback(() => {
-    if (audioRef.current && phaseRef.current !== 'off') go('listening')
+    if (audioRef.current && phaseRef.current === 'waiting') go('listening')
   }, [go])
 
   const mute = useCallback(

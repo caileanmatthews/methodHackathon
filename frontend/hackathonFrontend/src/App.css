@@ -824,6 +824,12 @@ textarea:focus {
   gap: 18px;
 }
 
+/* Each message sits in a wrapper (it carries the scroll ref); the wrapper is the flex column the bubble aligns in. */
+.msg-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
 .msg {
   max-width: min(720px, 92%);
   display: grid;
@@ -877,6 +883,19 @@ textarea:focus {
   border-radius: var(--radius);
   color: var(--muted);
   font-style: italic;
+}
+
+.msg-note {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.msg-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  color: var(--muted);
 }
 
 .msg-error {
