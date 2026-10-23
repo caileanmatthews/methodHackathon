@@ -1,0 +1,16 @@
+timestamp,substation,point,event,value,operator_note
+2027-01-19 01:52:10,Harlan Creek,B12,TRIP COMMAND (SCADA),Issued,Pre-storm switching test per storm plan
+2027-01-19 01:52:10,Harlan Creek,B12,BREAKER STATUS,No change (CLOSED),
+2027-01-19 01:52:38,Harlan Creek,B12,TRIP COMMAND (SCADA),Issued,2nd attempt
+2027-01-19 01:52:38,Harlan Creek,B12,BREAKER STATUS,OPEN,Opened on 2nd command
+2027-01-19 02:06:15,Harlan Creek,B12,CLOSE COMMAND (SCADA),Issued,Restored normal configuration
+2027-01-19 02:06:15,Harlan Creek,B12,BREAKER STATUS,CLOSED,Dispatching tech
+2027-01-18 18:10:02,Harlan Creek,T1 LTC,TAP POSITION,8R,
+2027-01-18 18:10:49,Harlan Creek,T1 LTC,TAP POSITION,7R,
+2027-01-18 18:11:37,Harlan Creek,T1 LTC,TAP POSITION,8R,
+2027-01-18 18:12:24,Harlan Creek,T1 LTC,TAP POSITION,7R,
+2027-01-18 18:50:31,Harlan Creek,T1 LTC,TAP POSITION SUMMARY,48 operations 18:10-18:50 alternating 7R/8R,Load shifted at 18:51 and hunting stopped
+2027-01-18 18:50:31,Harlan Creek,T1 LTC,REGULATED VOLTAGE (120V base),Alternating approx. 121.6 / 122.35,
+2026-09-28 14:22:07,Quarry Road,Feeder 3,FAULT RECORD,B-C phase fault approx. 3000 A primary (25 A secondary),Tree contact per patrol
+2026-09-28 14:22:08.76,Quarry Road,Feeder 3,RELAY OPERATION,Phase C 51 operated at 1.76 s after fault inception,Breaker opened. Fault cleared
+2026-09-28 14:22:08.76,Quarry Road,Feeder 3,RELAY TARGETS,Phase C target dropped. Phase B target NOT dropped,Phase B saw same fault current

@@ -1,0 +1,31 @@
+wo_number,date,asset_ref,substation,wo_type,tech,labor_hrs,status,notes
+WO-03-11782,2003-11-04,B12,Harlan Creek,PM,RT,10,Closed,Full PM. Oil D877 31kV all tanks OK. Ductor A 180 B 195 C 188 uohm. Timing 2.5 cyc. Lubed mech per mfr.
+WO-09-00342,2009-01-16,Harlan B12,Harlan Creek,CM,RT,4,Closed,"Brkr slow to trip on routine test, 2nd op OK. Cold AM -4F. Cab felt cold - heater tstat stuck open. Replaced tstat. Retest 2.6 cyc."
+WO-09-06120,2009-06-22,B-12,Harlan Creek,PM,RT,9,Closed,PM per std proc.
+WO-11-08815,2011-08-02,F3 51,Quarry Road,Settings,LO,3,Closed,Applied settings per 2011 coordination study. 600:5 tap 5.0 TD 4.0. Tested pickup + timing all phases OK.
+WO-12-01455,2012-01-30,B14,Harlan Creek,CM,RT,3,Closed,"SF6 low density alarm overnight -6F. Tank heaters off - heater ckt fuse blown. Replaced fuse, alarm cleared as gas warmed. Gas pressure OK at temp."
+WO-13-06301,2013-06-11,T1 LTC,Harlan Creek,PM,RT,8,Closed,"LTC insp. Contacts moderate wear. Oil filtered. Counter 141,092. VRC-2 checked, settings per sheet."
+WO-14-00287,2014-01-23,52-12,Harlan Creek,CM,RT,5,Closed,"Failed to open on SCADA trip cmd, opened on 2nd cmd. Single digits overnight. Trip latch + roller stiff, old factory grease gone to varnish. Isolated, springs dumped, cleaned latch w/ solvent, relubed w/ Mobilgrease 28. Timed 2.6 cyc. Told ops do NOT keep re-sending trip, coil got hot."
+WO-14-09455,2014-09-16,QR F3 relay,Quarry Road,Test,LO,4,Closed,Routine test. B ph pickup 5.05A OK. Lots of grit in drag magnet gap all 3 ph - quarry dust. Cleaned. Timing OK after.
+WO-15-04410,2015-04-21,HC Cap Bank 1,Harlan Creek,PM,DM,4,Closed,"Cap bank insp. 2 cans bulged ph A, replaced. Fuses OK."
+WO-16-00611,2016-02-09,B12,Harlan Creek,CM,KP,3,Closed,Trip coil open (burned). Replaced TC. Ops sent 4 trip attempts during cold snap before it opened. Brkr opened on manual trip after TC replacement.
+WO-16-00630,2016-02-10,HC-B12,Harlan Creek,CM,RT,6,Closed,Follow up to WO-16-00611. Root cause latch again. Latch engagement adj screw had backed off - measured 0.040 in. Reset to spec + locknut. Cleaned/relubed latch Mobil 28. Timing 2.7 cyc. Min trip V test OK at 70 VDC.
+WO-17-01102,2017-01-09,52-14,Harlan Creek,PM,KP,6,Closed,SF6 brkr PM per std proc. Timing 2.1 cyc. Gas moisture OK.
+WO-17-07720,2017-07-12,Harlan T1 tap changer,Harlan Creek,PM,DM,6,Closed,PM per std proc.
+WO-18-06210,2018-06-19,B12,Harlan Creek,PM,RT,10,Closed,"Full PM. Oil D877 28kV all tanks OK (trending down, recheck next PM). Ductor A 210 B 230 C 205 uohm. Timing 2.6 cyc. Heaters both working."
+WO-18-09133,2018-09-25,F3 51,Quarry Road,Test,LO,5,Closed,"B ph pickup 5.30A (6% high). Filings + grit in drag magnet gap again. Cleaned w/ magnet cleaner, disc coasts free now. Retest pickup 5.02A, timing in tol. RECOMMEND 2 YR TEST INTERVAL AT QRY DUE TO QUARRY DUST."
+WO-19-12048,2019-12-03,B-12,Harlan Creek,CM,SW,1,Closed,Heater ckt bkr in cabinet found tripped. Reset. Heater OK.
+WO-21-03315,2021-03-02,HCK Station Battery,Harlan Creek,CM,SW,8,Closed,Battery replaced (60 cell). Charger float set 2.25 V/cell.
+WO-22-09401,2022-09-20,Quarry Rd 51,Quarry Road,Test,DM,3,Closed,Tested per std proc. OK.
+WO-23-01877,2023-01-24,B-14,Harlan Creek,CM,DM,2,Closed,"Slow trip? Ops reported B14 alarm in cold. SF6 density low alarm, tank heater OK, alarm cleared by 10am. Monitor."
+WO-23-06114,2023-06-14,B12,Harlan Creek,PM,DM,9,Closed,Full PM per standard procedure. All tests within limits.
+WO-23-06115,2023-06-14,T1 LTC,Harlan Creek,DGA,DM,1,Closed,LTC compartment oil sample sent. Results normal for arcing LTC.
+WO-24-03207,2024-03-19,TC on T1,Harlan Creek,CM,KP,7,Closed,"VRC-2 control failed (no output). Replaced with new microprocessor LTC control. Settings transcribed from VRC-2 sheet: VSP 122.0, BW 0.6, TD 45s, LDC off. Counter 176,840."
+WO-24-07390,2024-07-22,T1 LTC,Harlan Creek,Inspection,SW,2,Closed,"Ops asked about high LTC op count. Counter 180,210. Mech operating normally, no binding. No trouble found."
+WO-24-10220,2024-10-08,QRY F1 relay,Quarry Road,Test,DM,3,Closed,"F1 uP relay tested, firmware updated. OK."
+WO-25-05118,2025-05-13,Harlan T1 tap changer,Harlan Creek,DGA,SW,1,Closed,LTC compartment DGA. Acetylene up vs 2023 sample. Lab recommends resample 12 mo and review op count.
+WO-25-08801,2025-08-14,Quarry Rd F2,Quarry Road,CM,SW,2,Closed,F2 relay alarm - self test fail. Replaced power supply card. OK.
+WO-25-11806,2025-11-18,B12,Harlan Creek,CM,SW,2,Open - awaiting material,"Cab heater - continuous element open circuit. Tstat heater element OK. Ordered replacement element, mfr obsolete, sourcing equivalent. Backorder."
+WO-26-01540,2026-01-12,HC-B14,Harlan Creek,CM,JR,2,Closed,B14 SF6 low density alarm at -2F. Tank heater thermostat stuck. Replaced. Alarm cleared.
+WO-26-02233,2026-02-04,Harlan B12,Harlan Creek,CM,JR,2,Closed,Ops says B12 seemed slow on SCADA trip during switching? Opened OK when I got there. No trouble found.
+WO-26-09870,2026-09-29,51-F3,Quarry Road,CM,JR,1,Open,"Ops event: B ph fault on Fdr 3, relay tripped slow per event recorder. Needs test. See scenario."

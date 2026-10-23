@@ -1,0 +1,10 @@
+asset_id,substation,description,manufacturer,model,install_year,detail_record
+HCK-OCB-B12,Harlan Creek,69 kV bulk oil circuit breaker (Line 69-4),Allied Switchgear Corp.,BOC-69-1200 (SM-3 spring mechanism),1982,assets.json
+HCK-SF6-B14,Harlan Creek,69 kV SF6 dead-tank circuit breaker (Transformer T1 high side),Nordwerk Energietechnik,NW-72S,2011,
+HCK-T1,Harlan Creek,69/12.47 kV power transformer 20 MVA,Allied Switchgear Corp. transformer div.,PT-20-69,1979,
+HCK-T1-LTC,Harlan Creek,Load tap changer on T1,Allied Switchgear Corp. transformer div.,LTC-32R,1979,assets.json
+HCK-CAP1,Harlan Creek,12.47 kV capacitor bank 3.6 MVAR,Eastline Capacitor,EC-36,2004,
+HCK-BATT,Harlan Creek,125 VDC station battery 60-cell,Volta Industrial,VI-60L,2021,
+QRY-F1-REL,Quarry Road,Feeder 1 microprocessor relay,Ardent Protection Systems,APS-351,2019,
+QRY-F2-REL,Quarry Road,Feeder 2 microprocessor relay,Ardent Protection Systems,APS-351,2019,
+QRY-F3-51,Quarry Road,Feeder 3 Phase B electromechanical overcurrent relay,Keystone Relay Company,KIO-8,1987,assets.json

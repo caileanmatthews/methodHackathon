@@ -1,0 +1,110 @@
+[
+  {
+    "asset_id": "HCK-OCB-B12",
+    "aliases": [
+      "B-12",
+      "B12",
+      "52-12",
+      "Harlan B12",
+      "HC-B12",
+      "Line 69-4 breaker"
+    ],
+    "asset_type": "Outdoor bulk oil circuit breaker",
+    "substation_id": "SUB-HCK",
+    "manufacturer": "Allied Switchgear Corp. (ceased operations 1998)",
+    "model": "BOC-69-1200",
+    "serial_number": "ASC-82-04417",
+    "install_year": 1982,
+    "ratings": {
+      "rated_voltage_kv": 72.5,
+      "continuous_current_a": 1200,
+      "interrupting_time_cycles": 5,
+      "control_voltage_vdc": 125
+    },
+    "mechanism": "Motor-charged spring stored-energy operating mechanism (Allied type SM-3)",
+    "insulating_oil_gal_per_tank": 340,
+    "cabinet_heater": "2 x 250 W strip heaters; one runs continuously (anti-condensation), one thermostat-controlled",
+    "protects": "69 kV Line 69-4 (Harlan Creek to Bel Air tie)",
+    "operations_counter": 2318,
+    "operations_counter_as_of": "2026-02-04",
+    "last_full_maintenance": "2023-06-14",
+    "last_mechanism_lubrication": "2016-02-10",
+    "manual_ref": "manuals/allied_BOC-69_manual_excerpt.md",
+    "condition_flags": [
+      "Manufacturer no longer supports",
+      "Original manual partially missing"
+    ],
+    "known_issues": ""
+  },
+  {
+    "asset_id": "QRY-F3-51",
+    "aliases": [
+      "F3 51",
+      "Feeder 3 OC relay",
+      "51-F3",
+      "QR F3 relay",
+      "Quarry Rd 51"
+    ],
+    "asset_type": "Electromechanical inverse-time overcurrent relay (phase, induction disc)",
+    "substation_id": "SUB-QRY",
+    "manufacturer": "Keystone Relay Company (product line discontinued 2004)",
+    "model": "KIO-8 (inverse time curve)",
+    "serial_number": "KRC-8-221906",
+    "install_year": 1987,
+    "settings_of_record": {
+      "ct_ratio": "600:5",
+      "tap_a": 5.0,
+      "time_dial": 4.0,
+      "instantaneous_unit": "Not used",
+      "settings_sheet_date": "2011-08-02"
+    },
+    "protects": "12.47 kV Distribution Feeder 3 (approx. 2,900 customers incl. quarry service)",
+    "relays_per_feeder": "3 phase relays (A, B, C) plus 1 ground relay. This record covers the Phase B relay.",
+    "last_test_date": "2022-09-20",
+    "manual_ref": "manuals/keystone_KIO-8_manual_excerpt.md",
+    "condition_flags": [
+      "Product line discontinued"
+    ],
+    "known_issues": ""
+  },
+  {
+    "asset_id": "HCK-T1-LTC",
+    "aliases": [
+      "T1 LTC",
+      "Harlan T1 tap changer",
+      "TC on T1",
+      "90-T1 (control)"
+    ],
+    "asset_type": "Load tap changer on 69/12.47 kV power transformer (arcing-in-oil, reactance type)",
+    "substation_id": "SUB-HCK",
+    "manufacturer": "Allied Switchgear Corp. transformer division (ceased operations 1998)",
+    "model": "LTC-32R",
+    "serial_number": "ASC-T-79-1102",
+    "install_year": 1979,
+    "ratings": {
+      "regulation_range": "+/- 10% in 32 steps (16 raise, 16 lower) plus neutral",
+      "step_size_percent": 0.625,
+      "step_size_volts_on_120V_base": 0.75,
+      "control_voltage_base": "LTC control voltages are on a 120 V base, measured through the voltage transformer on the 12.47 kV bus (120 V = 12.47 kV nominal). One 0.75 V step at the control is about 45 V phase-to-ground (78 V line-to-line) on the bus."
+    },
+    "control": {
+      "original_control": "Allied VRC-2 analog LTC control (removed 2024-03)",
+      "current_control": "Generic microprocessor LTC control, installed 2024-03-19",
+      "current_settings_entered": {
+        "voltage_set_point_v": 122.0,
+        "bandwidth_v": 0.6,
+        "time_delay_s": 45,
+        "line_drop_compensation": "Off"
+      },
+      "notes": "Settings transcribed from the original VRC-2 settings sheet at time of control replacement."
+    },
+    "operations_counter": 203118,
+    "operations_counter_as_of": "2026-10-01",
+    "last_ltc_oil_dga": "2023-06-14",
+    "manual_ref": "manuals/allied_LTC-32R_manual_excerpt.md",
+    "condition_flags": [
+      "Manufacturer no longer supports"
+    ],
+    "known_issues": ""
+  }
+]

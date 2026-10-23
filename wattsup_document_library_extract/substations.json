@@ -1,0 +1,28 @@
+[
+  {
+    "substation_id": "SUB-HCK",
+    "name": "Harlan Creek Substation",
+    "voltage_levels_kv": [69, 12.47],
+    "district": "Ridge District",
+    "latitude": 40.2980,
+    "longitude": -79.3850,
+    "access_notes": "Gravel access road off county route. Gate code in dispatch system. Cell signal weak inside control house; one bar at the gate.",
+    "control_house": true,
+    "station_battery": "125 VDC, 60-cell lead-acid, replaced 2021",
+    "surroundings": "Open farmland. Exposed ridge site; high wind and icing history.",
+    "assets": ["HCK-OCB-B12", "HCK-T1-LTC"]
+  },
+  {
+    "substation_id": "SUB-QRY",
+    "name": "Quarry Road Substation",
+    "voltage_levels_kv": [69, 12.47],
+    "district": "Ridge District",
+    "latitude": 40.4310,
+    "longitude": -79.2010,
+    "access_notes": "Shares entrance road with an active limestone quarry. Heavy truck traffic weekdays 6am-6pm.",
+    "control_house": true,
+    "station_battery": "125 VDC, 60-cell lead-acid, replaced 2018",
+    "surroundings": "Adjacent (approx. 300 m) to an active limestone quarry with crushing operations. Blasting schedule posted at quarry office.",
+    "assets": ["QRY-F3-51"]
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "_note": "SIMULATED cached response for the demo scenario, shaped like api.weather.gov output (simplified). Use live NWS data in your build; fall back to this file if live conditions at the hackathon date are not cold, or if the API is unavailable during judging.",
+  "location": {"substation_id": "SUB-HCK", "latitude": 40.2980, "longitude": -79.3850},
+  "retrieved": "2027-01-19T02:15:00-05:00",
+  "alerts": {
+    "features": [
+      {
+        "properties": {
+          "event": "Winter Storm Warning",
+          "severity": "Severe",
+          "onset": "2027-01-19T18:00:00-05:00",
+          "ends": "2027-01-20T12:00:00-05:00",
+          "headline": "Winter Storm Warning: freezing rain with ice accumulations of 0.25 to 0.5 inch; winds gusting to 40 mph on ridgetops.",
+          "instruction": "Power outages and tree damage are likely due to ice. Travel could be very difficult."
+        }
+      }
+    ]
+  },
+  "forecast": {
+    "periods": [
+      {"name": "Overnight", "startTime": "2027-01-19T02:00:00-05:00", "temperature": 11, "temperatureUnit": "F", "windSpeed": "10 to 15 mph", "shortForecast": "Mostly Cloudy"},
+      {"name": "Today", "startTime": "2027-01-19T06:00:00-05:00", "temperature": 24, "temperatureUnit": "F", "windSpeed": "15 to 20 mph", "shortForecast": "Cloudy, freezing rain developing late"},
+      {"name": "Tonight", "startTime": "2027-01-19T18:00:00-05:00", "temperature": 6, "temperatureUnit": "F", "windSpeed": "20 to 30 mph, gusts to 40", "shortForecast": "Freezing Rain then Snow"},
+      {"name": "Wednesday", "startTime": "2027-01-20T06:00:00-05:00", "temperature": 19, "temperatureUnit": "F", "windSpeed": "15 to 25 mph", "shortForecast": "Snow Showers Likely"}
+    ]
+  }
+}
